@@ -1,0 +1,50 @@
+﻿<Window x:Class="DrawingTool.Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DrawingTool"
+        Width="1100"
+        Height="720"
+        MinWidth="950"
+        MinHeight="620">
+    <Grid Margin="12">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <WrapPanel Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,10">
+            <Button Content="Build Scene" Width="120" Height="32" Margin="0,0,8,0" Click="BuildSceneClick" />
+            <Button Content="Move +20,+10" Width="120" Height="32" Margin="0,0,8,0" Click="MoveSceneClick" />
+            <Button Content="Scale x1.2" Width="120" Height="32" Margin="0,0,8,0" Click="ScaleSceneClick" />
+            <Button Content="Proxy Demo" Width="120" Height="32" Margin="0,0,8,0" Click="ProxyDemoClick" />
+            <Button Content="Export SVG" Width="120" Height="32" Click="ExportSvgClick" />
+        </WrapPanel>
+
+        <Border Grid.Row="1" Grid.Column="0" BorderThickness="1" BorderBrush="#CCC" Padding="8" Background="White">
+            <Canvas Name="ViewportCanvas" />
+        </Border>
+
+        <StackPanel Grid.Row="1" Grid.Column="1" Margin="10,0,0,0">
+            <TextBlock Text="SVG Output" FontWeight="SemiBold" Margin="0,0,0,8" />
+            <TextBox Name="SvgTextBox"
+                     VerticalScrollBarVisibility="Auto"
+                     HorizontalScrollBarVisibility="Auto"
+                     AcceptsReturn="True"
+                     TextWrapping="NoWrap"
+                     FontFamily="Consolas"
+                     Height="420" />
+        </StackPanel>
+
+        <TextBlock Grid.Row="2"
+                   Grid.ColumnSpan="2"
+                   Margin="0,10,0,0"
+                   Name="StatusText"
+                   FontSize="13"
+                   Text="Ready." />
+    </Grid>
+</Window>

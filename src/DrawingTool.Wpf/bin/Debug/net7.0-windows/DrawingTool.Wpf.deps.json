@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v7.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v7.0": {
+      "DrawingTool.Wpf/1.0.0": {
+        "dependencies": {
+          "DrawingTool.Core": "1.0.0"
+        },
+        "runtime": {
+          "DrawingTool.Wpf.dll": {}
+        }
+      },
+      "DrawingTool.Core/1.0.0": {
+        "runtime": {
+          "DrawingTool.Core.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "DrawingTool.Wpf/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "DrawingTool.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

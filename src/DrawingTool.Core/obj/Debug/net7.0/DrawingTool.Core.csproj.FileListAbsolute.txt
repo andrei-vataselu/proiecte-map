@@ -1,0 +1,11 @@
+E:\teme_dinca\DocumentParser\src\DrawingTool.Core\obj\Debug\net7.0\DrawingTool.Core.GeneratedMSBuildEditorConfig.editorconfig
+E:\teme_dinca\DocumentParser\src\DrawingTool.Core\obj\Debug\net7.0\DrawingTool.Core.AssemblyInfoInputs.cache
+E:\teme_dinca\DocumentParser\src\DrawingTool.Core\obj\Debug\net7.0\DrawingTool.Core.AssemblyInfo.cs
+E:\teme_dinca\DocumentParser\src\DrawingTool.Core\obj\Debug\net7.0\DrawingTool.Core.csproj.CoreCompileInputs.cache
+E:\teme_dinca\DocumentParser\src\DrawingTool.Core\bin\Debug\net7.0\DrawingTool.Core.deps.json
+E:\teme_dinca\DocumentParser\src\DrawingTool.Core\bin\Debug\net7.0\DrawingTool.Core.dll
+E:\teme_dinca\DocumentParser\src\DrawingTool.Core\bin\Debug\net7.0\DrawingTool.Core.pdb
+E:\teme_dinca\DocumentParser\src\DrawingTool.Core\obj\Debug\net7.0\DrawingTool.Core.dll
+E:\teme_dinca\DocumentParser\src\DrawingTool.Core\obj\Debug\net7.0\refint\DrawingTool.Core.dll
+E:\teme_dinca\DocumentParser\src\DrawingTool.Core\obj\Debug\net7.0\DrawingTool.Core.pdb
+E:\teme_dinca\DocumentParser\src\DrawingTool.Core\obj\Debug\net7.0\ref\DrawingTool.Core.dll

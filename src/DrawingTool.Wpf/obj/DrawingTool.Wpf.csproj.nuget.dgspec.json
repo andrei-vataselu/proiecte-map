@@ -1,0 +1,125 @@
+{
+  "format": 1,
+  "restore": {
+    "E:\\teme_dinca\\DocumentParser\\src\\DrawingTool.Wpf\\DrawingTool.Wpf.csproj": {}
+  },
+  "projects": {
+    "E:\\teme_dinca\\DocumentParser\\src\\DrawingTool.Core\\DrawingTool.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "E:\\teme_dinca\\DocumentParser\\src\\DrawingTool.Core\\DrawingTool.Core.csproj",
+        "projectName": "DrawingTool.Core",
+        "projectPath": "E:\\teme_dinca\\DocumentParser\\src\\DrawingTool.Core\\DrawingTool.Core.csproj",
+        "packagesPath": "C:\\Users\\andrewkarma\\.nuget\\packages\\",
+        "outputPath": "E:\\teme_dinca\\DocumentParser\\src\\DrawingTool.Core\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\andrewkarma\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.403\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "E:\\teme_dinca\\DocumentParser\\src\\DrawingTool.Wpf\\DrawingTool.Wpf.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "E:\\teme_dinca\\DocumentParser\\src\\DrawingTool.Wpf\\DrawingTool.Wpf.csproj",
+        "projectName": "DrawingTool.Wpf",
+        "projectPath": "E:\\teme_dinca\\DocumentParser\\src\\DrawingTool.Wpf\\DrawingTool.Wpf.csproj",
+        "packagesPath": "C:\\Users\\andrewkarma\\.nuget\\packages\\",
+        "outputPath": "E:\\teme_dinca\\DocumentParser\\src\\DrawingTool.Wpf\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\andrewkarma\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0-windows"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0-windows7.0": {
+            "targetAlias": "net7.0-windows",
+            "projectReferences": {
+              "E:\\teme_dinca\\DocumentParser\\src\\DrawingTool.Core\\DrawingTool.Core.csproj": {
+                "projectPath": "E:\\teme_dinca\\DocumentParser\\src\\DrawingTool.Core\\DrawingTool.Core.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0-windows7.0": {
+          "targetAlias": "net7.0-windows",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            },
+            "Microsoft.WindowsDesktop.App.WPF": {
+              "privateAssets": "none"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.403\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

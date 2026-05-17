@@ -18,13 +18,13 @@ TaskManager.sln
 
 ### SRP (Cerința 1)
 
-| Clasă | Actor / responsabilitate |
-|-------|--------------------------|
+| Clasă                      | Actor / responsabilitate                                              |
+| -------------------------- | --------------------------------------------------------------------- |
 | `MainForm`, `TaskEditForm` | Prezentare: afișare, filtre, evenimente → apelează doar `TaskService` |
-| `TaskService` | Orchestrare: CRUD, filtrare, finalizare + notificare |
-| `TaskValidator` | Validare reguli (titlu, due date pentru deadline) |
-| `SqliteTaskRepository` | Persistență SQLite |
-| `*Notifier` | Livrare notificări la finalizare |
+| `TaskService`              | Orchestrare: CRUD, filtrare, finalizare + notificare                  |
+| `TaskValidator`            | Validare reguli (titlu, due date pentru deadline)                     |
+| `SqliteTaskRepository`     | Persistență SQLite                                                    |
+| `*Notifier`                | Livrare notificări la finalizare                                      |
 
 O schimbare a UI-ului (ex. WPF) nu afectează `TaskService`. O schimbare a schemei DB nu afectează validatorul.
 

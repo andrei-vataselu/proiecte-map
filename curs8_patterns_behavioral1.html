@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Curs 8 — Design Patterns Comportamentale I | MAP</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;--bg4:#21262d;
+    --border:#30363d;--border2:#3d4450;
+    --accent:#58a6ff;--accent2:#79c0ff;--accent3:#1f6feb;
+    --green:#3fb950;--green-bg:#0d2a1a;--green-border:#1a4731;
+    --yellow:#d29922;--yellow-bg:#2a1f0a;--yellow-border:#4a3400;
+    --purple:#bc8cff;--purple-bg:#1a0d2e;--purple-border:#3a1f5a;
+    --red:#f85149;--red-bg:#2d0f0f;--red-border:#5a1e1e;--orange:#ffa657;
+    --text:#e6edf3;--text2:#8b949e;--text3:#6e7681;
+    --radius:8px;--radius2:12px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-size:15px;line-height:1.75;}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,17,23,.93);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;height:52px;display:flex;align-items:center;justify-content:space-between;}
+  .topbar-left{display:flex;align-items:center;gap:1rem;}
+  .course-badge{background:var(--accent3);color:#fff;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.05em;}
+  .course-title-nav{font-size:13px;color:var(--text2);font-weight:500;}
+  .topbar-right{display:flex;gap:.5rem;}
+  .nav-pill{font-size:11px;color:var(--text3);padding:4px 10px;border:1px solid var(--border);border-radius:20px;text-decoration:none;font-family:'JetBrains Mono',monospace;transition:all .2s;}
+  .nav-pill:hover{color:var(--accent);border-color:var(--accent3);background:rgba(31,111,235,.08);}
+
+  .layout{display:flex;margin-top:52px;}
+  .sidebar{width:255px;min-width:255px;height:calc(100vh - 52px);position:sticky;top:52px;overflow-y:auto;border-right:1px solid var(--border);padding:1.5rem 0;background:var(--bg);}
+  .sidebar::-webkit-scrollbar{width:3px;}
+  .sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+  .sidebar-heading{font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--text3);text-transform:uppercase;padding:.75rem 1.5rem .25rem;}
+  .sidebar-link{display:flex;align-items:center;gap:.6rem;padding:.42rem 1.5rem;color:var(--text2);text-decoration:none;font-size:13px;border-left:2px solid transparent;transition:all .15s;}
+  .sidebar-link:hover{color:var(--text);background:var(--bg2);border-left-color:var(--border2);}
+  .sidebar-link.active{color:var(--accent);background:rgba(88,166,255,.06);border-left-color:var(--accent);font-weight:500;}
+  .sidebar-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);min-width:18px;}
+  .sidebar-divider{border:none;border-top:1px solid var(--border);margin:.75rem 1.5rem;}
+
+  .main{flex:1;max-width:860px;padding:3rem 3.5rem 6rem;min-width:0;}
+  #scroll-prog{position:fixed;top:52px;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent3),var(--accent),var(--purple));transform-origin:left;transform:scaleX(0);z-index:99;transition:transform .1s;}
+
+  .hero{margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:1px solid var(--border);}
+  .hero-meta{display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;flex-wrap:wrap;}
+  .tag{font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;}
+  .tag-mod{background:rgba(255,166,87,.1);color:var(--orange);border:1px solid rgba(255,166,87,.2);}
+  .tag-lang{background:rgba(63,185,80,.1);color:var(--green);border:1px solid rgba(63,185,80,.2);}
+  .tag-n{background:var(--bg3);color:var(--text2);border:1px solid var(--border);}
+  .hero h1{font-size:2.2rem;font-weight:800;line-height:1.2;letter-spacing:-.02em;margin-bottom:.75rem;}
+  .hero h1 span{color:var(--orange);}
+  .hero-desc{font-size:15.5px;color:var(--text2);max-width:640px;}
+
+  .objectives{background:rgba(255,166,87,.05);border:1px solid rgba(255,166,87,.15);border-radius:var(--radius2);padding:1.5rem;margin-bottom:2.5rem;}
+  .objectives-title{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--orange);text-transform:uppercase;margin-bottom:1rem;}
+  .objectives ul{list-style:none;display:flex;flex-direction:column;gap:.5rem;}
+  .objectives li{display:flex;align-items:flex-start;gap:.75rem;font-size:14px;color:var(--text2);}
+  .objectives li::before{content:'→';color:var(--orange);font-weight:700;flex-shrink:0;font-family:'JetBrains Mono',monospace;}
+
+  .section{margin-bottom:3rem;}
+  h2.stitle{font-size:1.35rem;font-weight:700;color:var(--text);margin-bottom:1.5rem;padding-bottom:.75rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem;letter-spacing:-.01em;}
+  h2.stitle .num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--orange);background:rgba(255,166,87,.12);padding:2px 8px;border-radius:4px;}
+  h3.sub{font-size:1.05rem;font-weight:600;color:var(--text);margin:2rem 0 .75rem;display:flex;align-items:center;gap:.5rem;}
+  h3.sub .dot{width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0;}
+  h4.subsub{font-size:.95rem;font-weight:600;color:var(--text2);margin:1.5rem 0 .5rem;padding-left:.75rem;border-left:2px solid var(--border2);}
+
+  p{color:var(--text2);margin-bottom:.85rem;}
+  p:last-child{margin-bottom:0;}
+  strong{color:var(--text);font-weight:600;}
+  em{color:var(--orange);font-style:normal;font-weight:500;}
+  code{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--accent2);background:rgba(88,166,255,.08);padding:1px 6px;border-radius:4px;border:1px solid rgba(88,166,255,.12);}
+
+  /* PATTERN CARD */
+  .pattern-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden;margin-bottom:2.5rem;}
+  .pattern-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:1.25rem;}
+  .pattern-icon{font-size:2rem;flex-shrink:0;}
+  .pattern-name{font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:.15rem;}
+  .pattern-intent{font-size:13px;color:var(--text2);line-height:1.5;}
+  .pattern-meta{display:flex;gap:.5rem;margin-top:.5rem;flex-wrap:wrap;}
+  .pattern-tag{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;}
+  .pattern-tag.behavioral{background:rgba(63,185,80,.12);color:var(--green);}
+  .pattern-tag.gof{background:var(--bg4);color:var(--text3);border:1px solid var(--border);}
+  .pattern-body{padding:1.5rem;}
+
+  /* EXAMPLE BOX */
+  .example-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden;margin:1.5rem 0;}
+  .example-header{padding:.6rem 1rem;background:var(--bg4);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.65rem;}
+  .example-num{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(255,166,87,.12);color:var(--orange);}
+  .example-title{font-size:13.5px;font-weight:600;color:var(--text);}
+  .example-body{padding:1rem 1.25rem;}
+
+  /* CODE */
+  .code-block{background:#0d1117;border:1px solid var(--border);border-radius:var(--radius2);margin:1.25rem 0;overflow:hidden;}
+  .code-header{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1rem;border-bottom:1px solid var(--border);background:var(--bg3);}
+  .code-fname{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:.5rem;}
+  .code-fname .ok{color:var(--green);}
+  .code-fname .bad{color:var(--red);}
+  .code-lang-tag{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);background:var(--bg4);padding:2px 8px;border-radius:4px;}
+  pre{padding:1.25rem 1.5rem;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.65;}
+  pre::-webkit-scrollbar{height:4px;}
+  pre::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+  .kw{color:#ff7b72;}.tp{color:#79c0ff;}.ifc{color:#d2a8ff;}.mth{color:#d2a8ff;}
+  .str{color:#a5d6ff;}.num{color:#79c0ff;}.cmt{color:#6e7681;font-style:italic;}.prp{color:#e6edf3;}
+  .ann{color:#ffa657;}
+
+  /* CALLOUT */
+  .callout{border-radius:var(--radius);padding:1rem 1.25rem;margin:1.25rem 0;display:flex;gap:.85rem;align-items:flex-start;}
+  .callout-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+  .callout-body{flex:1;}
+  .callout-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem;}
+  .callout p{font-size:13.5px;margin-bottom:0;}
+  .callout.info{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);}
+  .callout.info .callout-title{color:var(--accent);}
+  .callout.warn{background:var(--yellow-bg);border:1px solid var(--yellow-border);}
+  .callout.warn .callout-title{color:var(--yellow);}
+  .callout.ok{background:var(--green-bg);border:1px solid var(--green-border);}
+  .callout.ok .callout-title{color:var(--green);}
+  .callout.danger{background:var(--red-bg);border:1px solid var(--red-border);}
+  .callout.danger .callout-title{color:var(--red);}
+  .callout.note{background:var(--purple-bg);border:1px solid var(--purple-border);}
+  .callout.note .callout-title{color:var(--purple);}
+
+  /* WHEN GRID */
+  .when-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:1rem 0;}
+  .when-card{border-radius:var(--radius);padding:.85rem 1rem;font-size:13px;line-height:1.55;}
+  .when-card.use{background:var(--green-bg);border:1px solid var(--green-border);color:var(--text2);}
+  .when-card.avoid{background:var(--red-bg);border:1px solid var(--red-border);color:var(--text2);}
+  .when-card-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem;}
+  .when-card.use .when-card-title{color:var(--green);}
+  .when-card.avoid .when-card-title{color:var(--red);}
+  @media(max-width:600px){.when-grid{grid-template-columns:1fr;}}
+
+  /* COMPARE */
+  .compare{display:flex;flex-direction:column;gap:1rem;margin:1.25rem 0;}
+  .compare-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:.35rem .75rem;border-radius:var(--radius) var(--radius) 0 0;display:flex;align-items:center;gap:.4rem;}
+  .compare-label.before{background:rgba(248,81,73,.12);color:var(--red);border:1px solid var(--red-border);border-bottom:none;}
+  .compare-label.after{background:rgba(63,185,80,.12);color:var(--green);border:1px solid var(--green-border);border-bottom:none;}
+  .compare-col .code-block{margin:0;border-radius:0 0 var(--radius2) var(--radius2);}
+  .compare-col.before .code-block{border-color:var(--red-border);}
+  .compare-col.after .code-block{border-color:var(--green-border);}
+  .cquote{border-left:3px solid var(--orange);padding:.75rem 1.25rem;background:rgba(255,166,87,.04);border-radius:0 var(--radius) var(--radius) 0;margin:1rem 0;font-size:15px;color:var(--text);line-height:1.6;}
+
+  /* UML */
+  .uml-wrap{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0 2rem;}
+  .uml-container{background:#161b22;border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden;}
+  .uml-title{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);background:var(--bg3);border-bottom:1px solid var(--border);padding:.45rem 1rem;}
+  .uml-mermaid{padding:.75rem;overflow-x:auto;}
+  .uml-mermaid svg{max-width:100%;height:auto;display:block;}
+  @media(max-width:700px){.uml-wrap{grid-template-columns:1fr;}}
+
+  /* OVERVIEW TABLE */
+  .patterns-overview{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:13.5px;}
+  .patterns-overview th{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);padding:.5rem 1rem;text-align:left;border-bottom:1px solid var(--border);}
+  .patterns-overview td{padding:.55rem 1rem;border-bottom:1px solid rgba(48,54,61,.4);vertical-align:top;color:var(--text2);}
+  .patterns-overview tr:last-child td{border-bottom:none;}
+  .patterns-overview tr:hover td{background:var(--bg2);}
+  .pat-name{font-family:'JetBrains Mono',monospace;color:var(--accent2);font-weight:600;}
+  .pat-done{color:var(--green);}
+  .pat-today{color:var(--orange);}
+  .pat-next{color:var(--text3);}
+
+  /* LAB */
+  .lab-box{background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--radius2);margin:2rem 0;}
+  .lab-header{background:rgba(63,185,80,.12);border-bottom:1px solid var(--green-border);padding:1rem 1.5rem;display:flex;align-items:center;gap:.75rem;}
+  .lab-header-icon{font-size:1.3rem;}
+  .lab-header-text h4{font-size:14px;font-weight:700;color:var(--green);margin-bottom:.1rem;}
+  .lab-header-text p{font-size:12px;color:var(--text2);margin:0;}
+  .lab-body{padding:1.25rem 1.25rem 1.5rem;}
+  .lab-body p{color:var(--text2);font-size:14px;}
+  .lab-section{margin-top:1.25rem;}
+  .lab-section-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:.6rem;}
+  .lab-req{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden;margin:.75rem 0;}
+  .lab-req-header{padding:.6rem 1rem;background:var(--bg4);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.65rem;}
+  .lab-req-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;flex-shrink:0;}
+  .lab-req-title{font-size:13.5px;font-weight:600;color:var(--text);}
+  .lab-req-body{padding:.9rem 1.1rem;overflow:hidden;}
+  .lab-req-body ul{list-style:none;display:block;margin:0;padding:0;}
+  .lab-req-body li{font-size:13px;color:var(--text2);line-height:1.6;padding-left:1.2rem;position:relative;overflow-wrap:break-word;margin-bottom:.45rem;}
+  .lab-req-body li:last-child{margin-bottom:0;}
+  .lab-req-body li::before{content:'▸';color:var(--green);font-size:11px;position:absolute;left:0;top:3px;}
+  .lab-deliverable{margin-top:1.25rem;padding:1rem;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.15);border-radius:var(--radius);}
+  .lab-deliverable-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:.5rem;}
+  .lab-deliverable p{font-size:13px;color:var(--text2);margin:0;}
+  .lab-mockup{font-family:'JetBrains Mono',monospace;font-size:11.5px;background:#0d1117;border:1px solid var(--border);border-radius:var(--radius);padding:.85rem 1rem;line-height:1.5;margin:.75rem 0;overflow-x:auto;white-space:pre;color:var(--text2);}
+
+  /* UI MOCKUP — desen al aplicației ca miniatură */
+  .ui-mockup{background:#0d1117;border:1px solid var(--border);border-radius:var(--radius);padding:.6rem;margin:.75rem 0;font-family:'Sora',sans-serif;}
+  .ui-mockup *{box-sizing:border-box;}
+  .ui-window{display:flex;flex-direction:column;background:#161b22;border:1px solid var(--border2);border-radius:6px;overflow:hidden;}
+  .ui-header{display:flex;align-items:center;justify-content:space-between;padding:.5rem .75rem;background:#1c2128;border-bottom:1px solid var(--border);}
+  .ui-app-title{font-size:12.5px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:.4rem;}
+  .ui-header-actions{display:flex;gap:.4rem;}
+  .ui-btn-sm{font-size:10.5px;padding:3px 8px;background:var(--bg4);border:1px solid var(--border2);border-radius:4px;color:var(--text2);cursor:default;}
+  .ui-btn-sm.disabled{opacity:.4;}
+  .ui-body{display:grid;grid-template-columns:42% 58%;gap:1px;background:var(--border);}
+  .ui-col{display:flex;flex-direction:column;background:#161b22;}
+  .ui-panel{padding:.75rem .85rem;border-bottom:1px solid var(--border);}
+  .ui-panel:last-child{border-bottom:none;}
+  .ui-panel-label{font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.55rem;display:flex;align-items:center;justify-content:space-between;}
+  .ui-panel-label .pl-count{font-weight:500;color:var(--text3);}
+
+  /* Library list */
+  .ui-track-head{display:grid;grid-template-columns:18px 1fr 38px;gap:.5rem;font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--text3);text-transform:uppercase;padding:0 .25rem .25rem;border-bottom:1px solid var(--border);margin-bottom:.25rem;}
+  .ui-track{display:grid;grid-template-columns:18px 1fr 38px;gap:.5rem;font-size:11.5px;color:var(--text2);padding:.18rem .25rem;border-radius:3px;align-items:center;}
+  .ui-track.active{background:rgba(255,166,87,.12);color:var(--text);}
+  .ui-track .ti{color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:10.5px;}
+  .ui-track.active .ti{color:var(--orange);}
+  .ui-track .tt{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ui-track .td{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--text3);text-align:right;}
+  .ui-add{margin-top:.5rem;padding:.4rem;text-align:center;font-size:11px;color:var(--accent2);border:1px dashed var(--border2);border-radius:4px;}
+
+  /* Playback Mode */
+  .ui-radio-group{display:flex;flex-direction:column;gap:.3rem;}
+  .ui-radio{display:flex;align-items:center;gap:.5rem;font-size:11.5px;color:var(--text2);}
+  .ui-radio .dot{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--text3);position:relative;flex-shrink:0;}
+  .ui-radio.checked .dot{border-color:var(--green);}
+  .ui-radio.checked .dot::after{content:'';position:absolute;inset:2px;border-radius:50%;background:var(--green);}
+  .ui-radio.checked{color:var(--text);}
+
+  /* Statistics */
+  .ui-stat-row{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--text2);padding:.18rem 0;}
+  .ui-stat-row .sv{font-family:'JetBrains Mono',monospace;color:var(--text);}
+
+  /* Now Playing */
+  .ui-np{display:flex;flex-direction:column;align-items:center;gap:.65rem;padding:.25rem 0;}
+  .ui-cover{width:120px;height:120px;background:linear-gradient(135deg,#1f6feb 0%,#bc8cff 100%);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:32px;color:rgba(255,255,255,.85);box-shadow:0 4px 12px rgba(0,0,0,.4);}
+  .ui-np-meta{text-align:center;line-height:1.4;}
+  .ui-np-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:.1rem;}
+  .ui-np-artist{font-size:12px;color:var(--text2);margin-bottom:.05rem;}
+  .ui-np-album{font-size:10.5px;color:var(--text3);}
+
+  /* History */
+  .ui-history{display:flex;flex-direction:column;gap:.25rem;}
+  .ui-hist-item{display:flex;align-items:flex-start;gap:.5rem;font-size:11px;color:var(--text2);padding:.15rem 0;}
+  .ui-hist-item .icon{color:var(--text3);width:14px;flex-shrink:0;font-family:'JetBrains Mono',monospace;}
+  .ui-hist-item.first .icon{color:var(--purple);}
+  .ui-hist-item .label{color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:10.5px;min-width:64px;flex-shrink:0;}
+  .ui-hist-item .val{color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  /* Transport bar */
+  .ui-transport{display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;padding:.7rem 1rem;background:#0d1117;border-top:1px solid var(--border);}
+  .ui-controls{display:flex;gap:.4rem;}
+  .ui-ctrl-btn{width:30px;height:30px;border-radius:50%;background:var(--bg4);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text);}
+  .ui-ctrl-btn.play{background:var(--accent3);border-color:var(--accent);color:#fff;width:36px;height:36px;}
+  .ui-progress-wrap{display:flex;flex-direction:column;gap:.2rem;}
+  .ui-progress{height:4px;background:var(--bg4);border-radius:2px;position:relative;}
+  .ui-progress::after{content:'';position:absolute;left:0;top:0;bottom:0;width:30%;background:linear-gradient(90deg,var(--accent3),var(--accent));border-radius:2px;}
+  .ui-progress::before{content:'';position:absolute;left:30%;top:50%;width:10px;height:10px;background:var(--text);border-radius:50%;transform:translate(-50%,-50%);}
+  .ui-time{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);}
+  .ui-volume{display:flex;align-items:center;gap:.4rem;font-size:13px;color:var(--text2);}
+  .ui-vol-bar{width:60px;height:3px;background:var(--bg4);border-radius:2px;position:relative;}
+  .ui-vol-bar::after{content:'';position:absolute;left:0;top:0;bottom:0;width:65%;background:var(--text2);border-radius:2px;}
+
+  /* Mobile fallback */
+  @media(max-width:600px){
+    .ui-body{grid-template-columns:1fr;}
+    .ui-transport{grid-template-columns:1fr;gap:.5rem;}
+    .ui-cover{width:90px;height:90px;font-size:24px;}
+  }
+
+  /* STRUCTURE TREE */
+  .structure-tree{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:#0d1117;border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;line-height:2;margin:.75rem 0;overflow-x:auto;white-space:pre;}
+  .st-folder{color:var(--accent2);}
+  .st-file{color:var(--text2);}
+  .st-comment{color:var(--text3);font-size:11.5px;}
+
+  /* QUESTIONS & RESOURCES */
+  .questions-box{background:var(--purple-bg);border:1px solid var(--purple-border);border-radius:var(--radius2);padding:1.5rem;margin-top:2rem;}
+  .questions-title{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--purple);text-transform:uppercase;margin-bottom:1rem;}
+  .questions-box ol{padding-left:1.5rem;display:flex;flex-direction:column;gap:.6rem;}
+  .questions-box li{color:var(--text2);font-size:14px;}
+  .resources{border-top:1px solid var(--border);padding-top:1.5rem;margin-top:2rem;}
+  .resources-title{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;margin-bottom:1rem;}
+  .resource-list{display:flex;flex-direction:column;gap:.5rem;}
+  .resource-item{display:flex;align-items:center;gap:.75rem;font-size:13px;color:var(--text2);}
+  .resource-item::before{content:'📖';font-size:14px;}
+
+  .progress-bar{height:3px;background:linear-gradient(90deg,var(--accent3),var(--orange),var(--purple));border-radius:2px;margin-bottom:2.5rem;width:calc(8/14*100%);opacity:.8;}
+
+  @media(max-width:900px){.sidebar{display:none;}.main{padding:2rem 1.5rem 4rem;}}
+</style>
+</head>
+<body>
+<div id="scroll-prog"></div>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="course-badge">MAP</span>
+    <span class="course-title-nav">Metode Avansate de Programare</span>
+  </div>
+  <div class="topbar-right">
+    <a href="curs7_patterns_structural2.html" class="nav-pill">← Curs 7</a>
+    <a href="curs9_patterns_behavioral2.html"  class="nav-pill">Curs 9 →</a>
+  </div>
+</div>
+
+<div class="layout">
+<aside class="sidebar">
+  <div>
+    <div class="sidebar-heading">Conținut</div>
+    <a href="#intro"    class="sidebar-link active"><span class="sidebar-num">01</span>Context</a>
+    <a href="#observer" class="sidebar-link"><span class="sidebar-num">02</span>Observer</a>
+    <a href="#strategy" class="sidebar-link"><span class="sidebar-num">03</span>Strategy</a>
+    <a href="#command"  class="sidebar-link"><span class="sidebar-num">04</span>Command</a>
+    <a href="#iterator" class="sidebar-link"><span class="sidebar-num">05</span>Iterator</a>
+    <a href="#comparatie" class="sidebar-link"><span class="sidebar-num">06</span>Comparație</a>
+    <a href="#lab"        class="sidebar-link"><span class="sidebar-num">07</span>Laborator 8</a>
+  </div>
+  <hr class="sidebar-divider">
+  <div>
+    <div class="sidebar-heading">Cursurile MAP</div>
+    <a href="curs1_oop.html"                  class="sidebar-link"><span class="sidebar-num">01</span>Recapitulare OOP</a>
+    <a href="curs2_uml.html"                  class="sidebar-link"><span class="sidebar-num">02</span>UML</a>
+    <a href="curs3_solid1.html"               class="sidebar-link"><span class="sidebar-num">03</span>SOLID I</a>
+    <a href="curs4_solid2.html"               class="sidebar-link"><span class="sidebar-num">04</span>SOLID II</a>
+    <a href="curs5_patterns_creational.html"  class="sidebar-link"><span class="sidebar-num">05</span>Patterns Creaționale</a>
+    <a href="curs6_patterns_structural1.html" class="sidebar-link"><span class="sidebar-num">06</span>Patterns Structurale I</a>
+    <a href="curs7_patterns_structural2.html" class="sidebar-link"><span class="sidebar-num">07</span>Patterns Structurale II</a>
+    <a href="curs8_patterns_behavioral1.html" class="sidebar-link active"><span class="sidebar-num">08</span>Patterns Comportamentale I</a>
+    <a href="#" class="sidebar-link" style="opacity:.4;pointer-events:none"><span class="sidebar-num">09</span>Patterns Comportamentale II</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="progress-bar"></div>
+
+  <header class="hero">
+    <div class="hero-meta">
+      <span class="tag tag-mod">Modul: Design Patterns</span>
+      <span class="tag tag-lang">C#</span>
+      <span class="tag tag-n">Curs 8 din 14</span>
+    </div>
+    <h1>Design Patterns <span>Comportamentale</span> — Partea I</h1>
+    <p class="hero-desc">Primele patru pattern-uri comportamentale din catalogul GoF: <em>Observer</em> — notificări automate către dependenți; <em>Strategy</em> — algoritmi interschimbabili la runtime; <em>Command</em> — operații încapsulate ca obiecte; <em>Iterator</em> — parcurgere uniformă fără a expune structura internă.</p>
+  </header>
+
+  <div class="objectives">
+    <div class="objectives-title">Obiective</div>
+    <ul>
+      <li>Implementați Observer pentru sisteme de evenimente decuplate și înțelegeți compromisurile între events native C# și IObservable&lt;T&gt;</li>
+      <li>Aplicați Strategy pentru a elimina lanțuri de if/switch pe tipuri și a permite extensia fără modificare</li>
+      <li>Encapsulați operații ca obiecte cu Command pentru undo/redo, cozi de execuție și logging</li>
+      <li>Distingeți Iterator clasic de iteratoarele native C# (IEnumerable + yield return) și înțelegeți când fiecare e potrivit</li>
+    </ul>
+  </div>
+
+  <!-- ── SECTION 1: INTRO ── -->
+  <section class="section" id="intro">
+    <h2 class="stitle"><span class="num">01</span>Context — pattern-urile comportamentale</h2>
+
+    <p>Pattern-urile <strong>creaționale</strong> (curs 5) răspund la întrebarea <em>cum se creează obiectele</em>. Cele <strong>structurale</strong> (cursurile 6–7) răspund la <em>cum se compun obiectele</em>. Pattern-urile <strong>comportamentale</strong> răspund la a treia întrebare fundamentală: <em>cum cooperează obiectele</em> — cine cere ce, cui, când, și cum se distribuie responsabilitățile între ele.</p>
+
+    <p>Tema centrală a tuturor pattern-urilor comportamentale este <strong>decuplarea</strong>: un obiect care comandă nu trebuie să cunoască obiectul care execută; un obiect care notifică nu trebuie să știe cine ascultă; un obiect care iterează nu trebuie să știe cum este stocată colecția.</p>
+
+    <table class="patterns-overview">
+      <thead>
+        <tr><th>Pattern</th><th>Problema rezolvată</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="pat-name">Observer</span></td><td>Notifică automat mai mulți dependenți la schimbarea stării</td><td class="pat-today">← astăzi</td></tr>
+        <tr><td><span class="pat-name">Strategy</span></td><td>Schimbă algoritmul la runtime fără a modifica clientul</td><td class="pat-today">← astăzi</td></tr>
+        <tr><td><span class="pat-name">Command</span></td><td>Încapsulează o cerere ca obiect — undo, queue, log</td><td class="pat-today">← astăzi</td></tr>
+        <tr><td><span class="pat-name">Iterator</span></td><td>Parcurge o colecție fără a expune structura internă</td><td class="pat-today">← astăzi</td></tr>
+        <tr><td><span class="pat-name">Template Method</span></td><td>Definește scheletul unui algoritm cu pași variabili</td><td class="pat-next">curs 9</td></tr>
+        <tr><td><span class="pat-name">Chain of Responsibility</span></td><td>Pasează cererea printr-un lanț de handler-i</td><td class="pat-next">curs 9</td></tr>
+        <tr><td><span class="pat-name">State</span></td><td>Schimbă comportamentul în funcție de starea internă</td><td class="pat-next">curs 9</td></tr>
+        <tr><td><span class="pat-name">Mediator, Visitor</span></td><td>Coordonare centrală / operații pe structuri eterogene</td><td class="pat-next">curs 9</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── SECTION 2: OBSERVER ── -->
+  <section class="section" id="observer">
+    <h2 class="stitle"><span class="num">02</span>Observer</h2>
+
+    <div class="pattern-card">
+      <div class="pattern-header">
+        <span class="pattern-icon">📡</span>
+        <div>
+          <div class="pattern-name">Observer</div>
+          <div class="pattern-intent">Definește o dependență unu-la-mulți între obiecte, astfel încât atunci când un obiect își schimbă starea, toți cei care depind de el sunt notificați și actualizați automat.</div>
+          <div class="pattern-meta">
+            <span class="pattern-tag behavioral">Comportamental</span>
+            <span class="pattern-tag gof">GoF</span>
+          </div>
+        </div>
+      </div>
+      <div class="pattern-body">
+
+        <p>Observer rezolvă o problemă concretă: <strong>cum notifici mai multe componente despre o schimbare fără ca sursa să le cunoască individual?</strong> Soluția: sursa (Subject) menține o listă de abonați (Observers) și îi parcurge când are loc o schimbare. Sursa nu știe ce fac abonații cu notificarea — doar că respectă contractul de notificare.</p>
+
+        <h3 class="sub"><span class="dot"></span>Structura generică (GoF)</h3>
+
+        <div class="uml-wrap">
+          <div class="uml-container">
+            <div class="uml-title">Diagramă de clase</div>
+            <div class="mermaid uml-mermaid">
+classDiagram
+    class Subject {
+        -observers List~Observer~
+        +attach(Observer)
+        +detach(Observer)
+        +notify()
+    }
+    class Observer {
+        &lt;&lt;interface&gt;&gt;
+        +update(state)
+    }
+    class ConcreteSubject {
+        -state
+        +getState()
+        +setState(state)
+    }
+    class ConcreteObserver {
+        +update(state)
+    }
+    Subject <|-- ConcreteSubject
+    Observer <|.. ConcreteObserver
+    Subject o--> Observer : observers
+    ConcreteObserver ..> ConcreteSubject : reads
+            </div>
+          </div>
+          <div class="uml-container">
+            <div class="uml-title">Diagramă de secvență</div>
+            <div class="mermaid uml-mermaid">
+sequenceDiagram
+    participant C as Client
+    participant S as Subject
+    participant O1 as Observer1
+    participant O2 as Observer2
+    C->>S: setState(newState)
+    Note over S: stare modificata
+    S->>O1: update(newState)
+    O1-->>S: ack
+    S->>O2: update(newState)
+    O2-->>S: ack
+    S-->>C: ok
+            </div>
+          </div>
+        </div>
+
+        <h3 class="sub"><span class="dot"></span>Structura C# — participanți canonici</h3>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-fname">Observer — structura generică</span>
+            <span class="code-lang-tag">C#</span>
+          </div>
+          <pre><span class="cmt">// Observer — interfața comună pentru toți abonații</span>
+<span class="kw">public interface</span> <span class="ifc">IObserver</span>&lt;<span class="tp">T</span>&gt;
+{
+    <span class="kw">void</span> <span class="mth">Update</span>(<span class="tp">T</span> data);
+}
+
+<span class="cmt">// Subject — sursa care emite notificări</span>
+<span class="kw">public class</span> <span class="tp">Subject</span>&lt;<span class="tp">T</span>&gt;
+{
+    <span class="kw">private readonly</span> <span class="tp">List</span>&lt;<span class="ifc">IObserver</span>&lt;<span class="tp">T</span>&gt;&gt; _observers = <span class="kw">new</span>();
+
+    <span class="kw">public void</span> <span class="mth">Attach</span>(<span class="ifc">IObserver</span>&lt;<span class="tp">T</span>&gt; observer)
+    {
+        <span class="kw">if</span> (!_observers.<span class="mth">Contains</span>(observer))
+            _observers.<span class="mth">Add</span>(observer);
+    }
+
+    <span class="kw">public void</span> <span class="mth">Detach</span>(<span class="ifc">IObserver</span>&lt;<span class="tp">T</span>&gt; observer) => _observers.<span class="mth">Remove</span>(observer);
+
+    <span class="cmt">// Iterăm pe o copie — un observer poate face Detach în Update()</span>
+    <span class="kw">protected void</span> <span class="mth">Notify</span>(<span class="tp">T</span> data)
+    {
+        <span class="kw">foreach</span> (<span class="kw">var</span> obs <span class="kw">in</span> _observers.<span class="mth">ToList</span>())
+            obs.<span class="mth">Update</span>(data);
+    }
+}
+
+<span class="cmt">// ConcreteSubject — extinde Subject cu stare proprie</span>
+<span class="kw">public class</span> <span class="tp">TemperatureSensor</span> : <span class="tp">Subject</span>&lt;<span class="tp">double</span>&gt;
+{
+    <span class="kw">private</span> <span class="tp">double</span> _temperature;
+
+    <span class="kw">public double</span> <span class="prp">Temperature</span>
+    {
+        <span class="kw">get</span> => _temperature;
+        <span class="kw">set</span>
+        {
+            _temperature = value;
+            <span class="mth">Notify</span>(value); <span class="cmt">// fiecare schimbare declanșează notificarea</span>
+        }
+    }
+}
+
+<span class="cmt">// ConcreteObserver — reacționează la notificări</span>
+<span class="kw">public class</span> <span class="tp">TemperatureDisplay</span> : <span class="ifc">IObserver</span>&lt;<span class="tp">double</span>&gt;
+{
+    <span class="kw">public void</span> <span class="mth">Update</span>(<span class="tp">double</span> temp)
+        => <span class="tp">Console</span>.<span class="mth">WriteLine</span>(<span class="str">$"[Display] Temperatură: {temp:F1}°C"</span>);
+}
+
+<span class="kw">var</span> sensor  = <span class="kw">new</span> <span class="tp">TemperatureSensor</span>();
+sensor.<span class="mth">Attach</span>(<span class="kw">new</span> <span class="tp">TemperatureDisplay</span>());
+sensor.<span class="prp">Temperature</span> = <span class="num">22.5</span>; <span class="cmt">// [Display] Temperatură: 22.5°C</span>
+sensor.<span class="prp">Temperature</span> = <span class="num">23.1</span>; <span class="cmt">// [Display] Temperatură: 23.1°C</span></pre>
+        </div>
+
+        <!-- EXAMPLE 1: STOCK MARKET -->
+        <div class="example-box">
+          <div class="example-header">
+            <span class="example-num">Exemplul 1</span>
+            <span class="example-title">Bursă — un emițător, mai mulți consumatori independenți</span>
+          </div>
+          <div class="example-body">
+            <p>O acțiune își schimbă prețul; trei componente independente trebuie să reacționeze: un afișaj live, un sistem de alertă pentru praguri și un logger pentru audit. Sursa (<code>Stock</code>) nu trebuie să le cunoască — doar emite notificări.</p>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-fname">StockMarket.cs</span>
+                <span class="code-lang-tag">C#</span>
+              </div>
+              <pre><span class="kw">public record</span> <span class="tp">StockUpdate</span>(<span class="tp">string</span> Symbol, <span class="tp">decimal</span> Price, <span class="tp">DateTime</span> At);
+
+<span class="kw">public interface</span> <span class="ifc">IStockObserver</span>
+{
+    <span class="kw">void</span> <span class="mth">OnPriceChanged</span>(<span class="tp">StockUpdate</span> update);
+}
+
+<span class="cmt">// Subject — acțiunea care își publică prețul</span>
+<span class="kw">public class</span> <span class="tp">Stock</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">List</span>&lt;<span class="ifc">IStockObserver</span>&gt; _observers = <span class="kw">new</span>();
+    <span class="kw">private</span> <span class="tp">decimal</span> _price;
+
+    <span class="kw">public</span> <span class="tp">string</span> <span class="prp">Symbol</span> { <span class="kw">get</span>; }
+    <span class="kw">public</span> <span class="mth">Stock</span>(<span class="tp">string</span> symbol, <span class="tp">decimal</span> initialPrice)
+        => (<span class="prp">Symbol</span>, _price) = (symbol, initialPrice);
+
+    <span class="kw">public void</span> <span class="mth">Subscribe</span>(<span class="ifc">IStockObserver</span> obs)   => _observers.<span class="mth">Add</span>(obs);
+    <span class="kw">public void</span> <span class="mth">Unsubscribe</span>(<span class="ifc">IStockObserver</span> obs) => _observers.<span class="mth">Remove</span>(obs);
+
+    <span class="kw">public void</span> <span class="mth">SetPrice</span>(<span class="tp">decimal</span> newPrice)
+    {
+        <span class="kw">if</span> (newPrice == _price) <span class="kw">return</span>; <span class="cmt">// nu notificăm dacă nu s-a schimbat nimic</span>
+        _price = newPrice;
+        <span class="kw">var</span> update = <span class="kw">new</span> <span class="tp">StockUpdate</span>(<span class="prp">Symbol</span>, newPrice, <span class="tp">DateTime</span>.UtcNow);
+        <span class="kw">foreach</span> (<span class="kw">var</span> obs <span class="kw">in</span> _observers.<span class="mth">ToList</span>())
+            obs.<span class="mth">OnPriceChanged</span>(update);
+    }
+}
+
+<span class="cmt">// Observer 1 — afișaj live</span>
+<span class="kw">public class</span> <span class="tp">StockDisplay</span> : <span class="ifc">IStockObserver</span>
+{
+    <span class="kw">public void</span> <span class="mth">OnPriceChanged</span>(<span class="tp">StockUpdate</span> u)
+        => <span class="tp">Console</span>.<span class="mth">WriteLine</span>(<span class="str">$"[Display] {u.Symbol}: {u.Price:C}"</span>);
+}
+
+<span class="cmt">// Observer 2 — alertă peste un prag</span>
+<span class="kw">public class</span> <span class="tp">StockAlert</span> : <span class="ifc">IStockObserver</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">decimal</span> _threshold;
+    <span class="kw">public</span> <span class="mth">StockAlert</span>(<span class="tp">decimal</span> threshold) => _threshold = threshold;
+
+    <span class="kw">public void</span> <span class="mth">OnPriceChanged</span>(<span class="tp">StockUpdate</span> u)
+    {
+        <span class="kw">if</span> (u.Price &gt;= _threshold)
+            <span class="tp">Console</span>.<span class="mth">WriteLine</span>(<span class="str">$"[ALERT] {u.Symbol} a depășit {_threshold:C}!"</span>);
+    }
+}
+
+<span class="cmt">// Observer 3 — log pentru audit</span>
+<span class="kw">public class</span> <span class="tp">StockLogger</span> : <span class="ifc">IStockObserver</span>
+{
+    <span class="kw">public void</span> <span class="mth">OnPriceChanged</span>(<span class="tp">StockUpdate</span> u)
+        => <span class="tp">Console</span>.<span class="mth">WriteLine</span>(<span class="str">$"[LOG {u.At:HH:mm:ss}] {u.Symbol} -> {u.Price:C}"</span>);
+}
+
+<span class="kw">var</span> apple = <span class="kw">new</span> <span class="tp">Stock</span>(<span class="str">"AAPL"</span>, <span class="num">180m</span>);
+apple.<span class="mth">Subscribe</span>(<span class="kw">new</span> <span class="tp">StockDisplay</span>());
+apple.<span class="mth">Subscribe</span>(<span class="kw">new</span> <span class="tp">StockAlert</span>(<span class="num">200m</span>));
+apple.<span class="mth">Subscribe</span>(<span class="kw">new</span> <span class="tp">StockLogger</span>());
+
+apple.<span class="mth">SetPrice</span>(<span class="num">195m</span>); <span class="cmt">// 3 reacții: display, log (alert nu — sub prag)</span>
+apple.<span class="mth">SetPrice</span>(<span class="num">205m</span>); <span class="cmt">// 3 reacții, inclusiv alert</span></pre>
+            </div>
+            <div class="callout info">
+              <span class="callout-icon">💡</span>
+              <div class="callout-body">
+                <div class="callout-title">De ce ToList() la iterare?</div>
+                <p>Dacă un observer face <code>Unsubscribe</code> în <code>OnPriceChanged()</code> — caz frecvent, ex. un alert care se dezabonează după ce s-a declanșat o dată — iterarea pe lista originală aruncă <code>InvalidOperationException: Collection was modified</code>. Iterarea pe o copie izolează colecția în timpul notificării.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="sub"><span class="dot"></span>Trei moduri de a face Observer în C#</h3>
+
+        <p>C# oferă trei mecanisme native care implementează idea de Observer, fiecare cu compromisuri proprii:</p>
+
+        <div class="example-box">
+          <div class="example-header">
+            <span class="example-num">Varianta A</span>
+            <span class="example-title">Implementare manuală cu interfață custom</span>
+          </div>
+          <div class="example-body">
+            <p>Așa cum ați văzut mai sus — control total, dar boilerplate manual: listă de observeri, Subscribe/Unsubscribe, iterare cu copie. Recomandat când contractul abonării are reguli specifice (filtrare, prioritizare, abonări tipizate pe sub-evenimente).</p>
+          </div>
+        </div>
+
+        <div class="example-box">
+          <div class="example-header">
+            <span class="example-num">Varianta B</span>
+            <span class="example-title">Events native C# — cel mai concis</span>
+          </div>
+          <div class="example-body">
+            <p>Sintaxă <code>event</code> + <code>EventHandler&lt;T&gt;</code>: cea mai compactă variantă, ideală pentru API-uri publice și UI. Compilatorul generează intern lista de subscriberi, iar operatorii <code>+=</code> / <code>-=</code> se ocupă de Subscribe/Unsubscribe.</p>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-fname">StockEvents.cs</span>
+                <span class="code-lang-tag">C#</span>
+              </div>
+              <pre><span class="kw">public class</span> <span class="tp">Stock</span>
+{
+    <span class="kw">public event</span> <span class="tp">EventHandler</span>&lt;<span class="tp">StockUpdate</span>&gt;? <span class="prp">PriceChanged</span>;
+
+    <span class="kw">public</span> <span class="tp">string</span> <span class="prp">Symbol</span> { <span class="kw">get</span>; }
+    <span class="kw">private</span> <span class="tp">decimal</span> _price;
+
+    <span class="kw">public</span> <span class="mth">Stock</span>(<span class="tp">string</span> symbol, <span class="tp">decimal</span> price)
+        => (<span class="prp">Symbol</span>, _price) = (symbol, price);
+
+    <span class="kw">public void</span> <span class="mth">SetPrice</span>(<span class="tp">decimal</span> newPrice)
+    {
+        <span class="kw">if</span> (newPrice == _price) <span class="kw">return</span>;
+        _price = newPrice;
+        <span class="cmt">// ?.Invoke — nu aruncă dacă nu există abonați</span>
+        <span class="prp">PriceChanged</span>?.<span class="mth">Invoke</span>(<span class="kw">this</span>, <span class="kw">new</span>(<span class="prp">Symbol</span>, newPrice, <span class="tp">DateTime</span>.UtcNow));
+    }
+}
+
+<span class="kw">var</span> apple = <span class="kw">new</span> <span class="tp">Stock</span>(<span class="str">"AAPL"</span>, <span class="num">180m</span>);
+
+<span class="cmt">// Abonare cu lambda — fără clase de Observer</span>
+apple.<span class="prp">PriceChanged</span> += (sender, u)
+    => <span class="tp">Console</span>.<span class="mth">WriteLine</span>(<span class="str">$"[Display] {u.Symbol}: {u.Price:C}"</span>);
+
+<span class="cmt">// Handler nominal — pentru a putea face -= la dezabonare</span>
+<span class="kw">void</span> <span class="mth">LogHandler</span>(<span class="tp">object</span>? s, <span class="tp">StockUpdate</span> u)
+    => <span class="tp">Console</span>.<span class="mth">WriteLine</span>(<span class="str">$"[LOG] {u.Symbol} {u.Price}"</span>);
+apple.<span class="prp">PriceChanged</span> += <span class="mth">LogHandler</span>;
+
+apple.<span class="mth">SetPrice</span>(<span class="num">195m</span>);
+
+apple.<span class="prp">PriceChanged</span> -= <span class="mth">LogHandler</span>; <span class="cmt">// dezabonare → fără memory leak</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="example-box">
+          <div class="example-header">
+            <span class="example-num">Varianta C</span>
+            <span class="example-title">IObservable&lt;T&gt; / IObserver&lt;T&gt; — fluxuri de date</span>
+          </div>
+          <div class="example-body">
+            <p>Modelul reactiv din <code>System</code> namespace, baza pentru <strong>Reactive Extensions (Rx.NET)</strong>. Diferențe față de events: notifică explicit terminarea fluxului (<code>OnCompleted</code>) și erorile (<code>OnError</code>), iar <code>Subscribe()</code> returnează un <code>IDisposable</code> pentru dezabonare deterministă. Recomandat pentru fluxuri de date asincrone, observabile compozabile (filter, map, throttle).</p>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-fname">StockObservable.cs</span>
+                <span class="code-lang-tag">C#</span>
+              </div>
+              <pre><span class="kw">public class</span> <span class="tp">Stock</span> : <span class="ifc">IObservable</span>&lt;<span class="tp">StockUpdate</span>&gt;
+{
+    <span class="kw">private readonly</span> <span class="tp">List</span>&lt;<span class="ifc">IObserver</span>&lt;<span class="tp">StockUpdate</span>&gt;&gt; _observers = <span class="kw">new</span>();
+
+    <span class="kw">public</span> <span class="ifc">IDisposable</span> <span class="mth">Subscribe</span>(<span class="ifc">IObserver</span>&lt;<span class="tp">StockUpdate</span>&gt; observer)
+    {
+        _observers.<span class="mth">Add</span>(observer);
+        <span class="cmt">// Returnăm un IDisposable; Dispose() = dezabonare</span>
+        <span class="kw">return new</span> <span class="tp">Unsubscriber</span>(_observers, observer);
+    }
+
+    <span class="kw">public void</span> <span class="mth">SetPrice</span>(<span class="tp">string</span> symbol, <span class="tp">decimal</span> price)
+    {
+        <span class="kw">var</span> u = <span class="kw">new</span> <span class="tp">StockUpdate</span>(symbol, price, <span class="tp">DateTime</span>.UtcNow);
+        <span class="kw">foreach</span> (<span class="kw">var</span> o <span class="kw">in</span> _observers.<span class="mth">ToList</span>())
+            o.<span class="mth">OnNext</span>(u);
+    }
+
+    <span class="kw">private class</span> <span class="tp">Unsubscriber</span> : <span class="ifc">IDisposable</span>
+    {
+        <span class="kw">private readonly</span> <span class="tp">List</span>&lt;<span class="ifc">IObserver</span>&lt;<span class="tp">StockUpdate</span>&gt;&gt; _list;
+        <span class="kw">private readonly</span> <span class="ifc">IObserver</span>&lt;<span class="tp">StockUpdate</span>&gt; _obs;
+        <span class="kw">public</span> <span class="mth">Unsubscriber</span>(<span class="tp">List</span>&lt;<span class="ifc">IObserver</span>&lt;<span class="tp">StockUpdate</span>&gt;&gt; list, <span class="ifc">IObserver</span>&lt;<span class="tp">StockUpdate</span>&gt; obs)
+            => (_list, _obs) = (list, obs);
+        <span class="kw">public void</span> <span class="mth">Dispose</span>() => _list.<span class="mth">Remove</span>(_obs);
+    }
+}
+
+<span class="kw">using var</span> sub = stock.<span class="mth">Subscribe</span>(<span class="kw">new</span> <span class="tp">DisplayObserver</span>());
+<span class="cmt">// La sfârșitul scope-ului, Dispose() se apelează automat → dezabonare</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">
+            <div class="callout-title">Memory leak la events</div>
+            <p>Cea mai frecventă greșeală: un obiect cu durată de viață scurtă (ex. o pagină UI) se abonează la un eveniment al unui obiect cu durată de viață lungă (ex. un serviciu singleton) și nu se dezabonează niciodată. Subiectul păstrează o referință la handler → handler-ul păstrează o referință la pagină → garbage collector nu poate elibera pagina. Soluții: <code>-=</code> explicit la <code>Dispose()</code>, <code>WeakEventManager</code> în WPF, sau <code>IDisposable</code> din varianta C cu <code>using</code>.</p>
+          </div>
+        </div>
+
+        <div class="when-grid">
+          <div class="when-card use">
+            <div class="when-card-title">✓ Când se potrivește</div>
+            Mai multe componente independente trebuie să reacționeze la aceeași schimbare. Sursa nu trebuie să cunoască consumatorii. Lista de abonați se schimbă la runtime. UI-uri (data binding), sisteme de mesagerie internă, monitoring, audit logging.
+          </div>
+          <div class="when-card avoid">
+            <div class="when-card-title">✗ Când nu se potrivește</div>
+            Există un singur consumator stabil — un apel direct e mai simplu și mai clar. Lanț de notificări dificil de urmărit (Observer → Observer → Observer) — preferă un mediator. Contracte sincrone unde ordinea apelurilor contează exact — Observer nu garantează ordinea.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 3: STRATEGY ── -->
+  <section class="section" id="strategy">
+    <h2 class="stitle"><span class="num">03</span>Strategy</h2>
+
+    <div class="pattern-card">
+      <div class="pattern-header">
+        <span class="pattern-icon">🎯</span>
+        <div>
+          <div class="pattern-name">Strategy</div>
+          <div class="pattern-intent">Definește o familie de algoritmi, încapsulează fiecare algoritm într-o clasă separată și îi face interschimbabili. Strategy permite ca algoritmul să varieze independent de clienții care îl folosesc.</div>
+          <div class="pattern-meta">
+            <span class="pattern-tag behavioral">Comportamental</span>
+            <span class="pattern-tag gof">GoF</span>
+          </div>
+        </div>
+      </div>
+      <div class="pattern-body">
+
+        <p>Simptomul care cere Strategy este aproape întotdeauna același: o metodă cu un <code>switch</code> sau un lanț de <code>if/else</code> care decide ce algoritm rulează în funcție de un tip sau o opțiune. Fiecare ramură poate să crească, iar adăugarea unei noi opțiuni cere modificarea unei clase existente — o încălcare directă a OCP.</p>
+
+        <h3 class="sub"><span class="dot"></span>De la if/switch la Strategy</h3>
+
+        <div class="compare">
+          <div class="compare-col before">
+            <div class="compare-label before">✗ Înainte — switch pe tip</div>
+            <div class="code-block">
+              <pre><span class="kw">public class</span> <span class="tp">DiscountCalculator</span>
+{
+    <span class="kw">public decimal</span> <span class="mth">Calculate</span>(<span class="tp">decimal</span> total, <span class="tp">string</span> customerType)
+    {
+        <span class="kw">return</span> customerType <span class="kw">switch</span>
+        {
+            <span class="str">"regular"</span>  => total,
+            <span class="str">"premium"</span>  => total * <span class="num">0.9m</span>,
+            <span class="str">"vip"</span>      => total * <span class="num">0.8m</span>,
+            <span class="str">"employee"</span> => total * <span class="num">0.5m</span>,
+            _ => <span class="kw">throw new</span> <span class="tp">ArgumentException</span>(
+                     <span class="str">$"Tip necunoscut: {customerType}"</span>)
+        };
+    }
+    <span class="cmt">// Adăugarea unui tip nou = modificarea acestei clase = test regresie</span>
+}</pre>
+            </div>
+          </div>
+          <div class="compare-col after">
+            <div class="compare-label after">✓ După — Strategy</div>
+            <div class="code-block">
+              <pre><span class="kw">public interface</span> <span class="ifc">IDiscountStrategy</span>
+{
+    <span class="tp">decimal</span> <span class="mth">Apply</span>(<span class="tp">decimal</span> total);
+}
+
+<span class="kw">public class</span> <span class="tp">RegularDiscount</span>  : <span class="ifc">IDiscountStrategy</span>
+    { <span class="kw">public decimal</span> <span class="mth">Apply</span>(<span class="tp">decimal</span> t) => t; }
+
+<span class="kw">public class</span> <span class="tp">PremiumDiscount</span>  : <span class="ifc">IDiscountStrategy</span>
+    { <span class="kw">public decimal</span> <span class="mth">Apply</span>(<span class="tp">decimal</span> t) => t * <span class="num">0.9m</span>; }
+
+<span class="kw">public class</span> <span class="tp">VipDiscount</span>      : <span class="ifc">IDiscountStrategy</span>
+    { <span class="kw">public decimal</span> <span class="mth">Apply</span>(<span class="tp">decimal</span> t) => t * <span class="num">0.8m</span>; }
+
+<span class="kw">public class</span> <span class="tp">EmployeeDiscount</span> : <span class="ifc">IDiscountStrategy</span>
+    { <span class="kw">public decimal</span> <span class="mth">Apply</span>(<span class="tp">decimal</span> t) => t * <span class="num">0.5m</span>; }
+
+<span class="cmt">// Noua strategie = clasă nouă, fără modificări altundeva</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="cquote">
+          Strategy mută decizia <em>care algoritm</em> din interiorul codului care îl folosește către un singur loc de configurare (factory, DI). Codul-client nu mai trebuie să cunoască alternativele — primește o strategie și o execută.
+        </div>
+
+        <h3 class="sub"><span class="dot"></span>Structura generică (GoF)</h3>
+
+        <div class="uml-wrap">
+          <div class="uml-container">
+            <div class="uml-title">Diagramă de clase</div>
+            <div class="mermaid uml-mermaid">
+classDiagram
+    class Strategy {
+        &lt;&lt;interface&gt;&gt;
+        +execute(data)
+    }
+    class StrategyA {
+        +execute(data)
+    }
+    class StrategyB {
+        +execute(data)
+    }
+    class Context {
+        -strategy Strategy
+        +setStrategy(Strategy)
+        +doWork(data)
+    }
+    Strategy <|.. StrategyA
+    Strategy <|.. StrategyB
+    Context o--> Strategy
+            </div>
+          </div>
+          <div class="uml-container">
+            <div class="uml-title">Diagramă de secvență</div>
+            <div class="mermaid uml-mermaid">
+sequenceDiagram
+    participant C as Client
+    participant Ctx as Context
+    participant S as Strategy
+    C->>Ctx: setStrategy(strategyA)
+    C->>Ctx: doWork(data)
+    Ctx->>S: execute(data)
+    S-->>Ctx: rezultat
+    Ctx-->>C: rezultat
+            </div>
+          </div>
+        </div>
+
+        <!-- EXAMPLE: SHIPPING -->
+        <div class="example-box">
+          <div class="example-header">
+            <span class="example-num">Exemplul 1</span>
+            <span class="example-title">Calcul cost livrare — strategii diferite per regiune</span>
+          </div>
+          <div class="example-body">
+            <p>Costul livrării depinde de greutate, distanță și tipul de transport. Fiecare combinație are formula proprie. <code>OrderService</code> nu trebuie să cunoască formulele — primește o strategie și o folosește.</p>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-fname">Shipping.cs</span>
+                <span class="code-lang-tag">C#</span>
+              </div>
+              <pre><span class="kw">public record</span> <span class="tp">Shipment</span>(<span class="tp">double</span> WeightKg, <span class="tp">double</span> DistanceKm);
+
+<span class="cmt">// Strategy — interfața comună</span>
+<span class="kw">public interface</span> <span class="ifc">IShippingStrategy</span>
+{
+    <span class="tp">decimal</span> <span class="mth">CalculateCost</span>(<span class="tp">Shipment</span> s);
+    <span class="tp">string</span>  <span class="prp">Name</span> { <span class="kw">get</span>; }
+}
+
+<span class="cmt">// ConcreteStrategy — livrare standard, cost fix + per kg</span>
+<span class="kw">public class</span> <span class="tp">StandardShipping</span> : <span class="ifc">IShippingStrategy</span>
+{
+    <span class="kw">public string</span> <span class="prp">Name</span> => <span class="str">"Standard"</span>;
+    <span class="kw">public decimal</span> <span class="mth">CalculateCost</span>(<span class="tp">Shipment</span> s)
+        => <span class="num">15m</span> + (<span class="tp">decimal</span>)s.WeightKg * <span class="num">2m</span>;
+}
+
+<span class="cmt">// ConcreteStrategy — express, taxă mai mare + factor distanță</span>
+<span class="kw">public class</span> <span class="tp">ExpressShipping</span> : <span class="ifc">IShippingStrategy</span>
+{
+    <span class="kw">public string</span> <span class="prp">Name</span> => <span class="str">"Express"</span>;
+    <span class="kw">public decimal</span> <span class="mth">CalculateCost</span>(<span class="tp">Shipment</span> s)
+        => <span class="num">35m</span> + (<span class="tp">decimal</span>)s.WeightKg * <span class="num">3.5m</span>
+              + (<span class="tp">decimal</span>)s.DistanceKm * <span class="num">0.05m</span>;
+}
+
+<span class="cmt">// ConcreteStrategy — gratuit pentru comenzi mari (semnătură identică)</span>
+<span class="kw">public class</span> <span class="tp">FreeShipping</span> : <span class="ifc">IShippingStrategy</span>
+{
+    <span class="kw">public string</span> <span class="prp">Name</span> => <span class="str">"Gratuit"</span>;
+    <span class="kw">public decimal</span> <span class="mth">CalculateCost</span>(<span class="tp">Shipment</span> _) => <span class="num">0m</span>;
+}
+
+<span class="cmt">// Context — folosește strategia, nu o cunoaște</span>
+<span class="kw">public class</span> <span class="tp">OrderService</span>
+{
+    <span class="kw">private</span> <span class="ifc">IShippingStrategy</span> _shipping;
+
+    <span class="kw">public</span> <span class="mth">OrderService</span>(<span class="ifc">IShippingStrategy</span> initial) => _shipping = initial;
+
+    <span class="cmt">// Strategia poate fi schimbată la runtime</span>
+    <span class="kw">public void</span> <span class="mth">UseShipping</span>(<span class="ifc">IShippingStrategy</span> strategy) => _shipping = strategy;
+
+    <span class="kw">public</span> <span class="tp">decimal</span> <span class="mth">QuoteShipping</span>(<span class="tp">Shipment</span> s)
+    {
+        <span class="kw">var</span> cost = _shipping.<span class="mth">CalculateCost</span>(s);
+        <span class="tp">Console</span>.<span class="mth">WriteLine</span>(<span class="str">$"[{_shipping.Name}] {s.WeightKg}kg, {s.DistanceKm}km → {cost:C}"</span>);
+        <span class="kw">return</span> cost;
+    }
+}
+
+<span class="kw">var</span> svc      = <span class="kw">new</span> <span class="tp">OrderService</span>(<span class="kw">new</span> <span class="tp">StandardShipping</span>());
+<span class="kw">var</span> shipment = <span class="kw">new</span> <span class="tp">Shipment</span>(<span class="num">5</span>, <span class="num">120</span>);
+
+svc.<span class="mth">QuoteShipping</span>(shipment);                    <span class="cmt">// [Standard] → 25 RON</span>
+svc.<span class="mth">UseShipping</span>(<span class="kw">new</span> <span class="tp">ExpressShipping</span>());
+svc.<span class="mth">QuoteShipping</span>(shipment);                    <span class="cmt">// [Express]  → 58.5 RON</span>
+svc.<span class="mth">UseShipping</span>(<span class="kw">new</span> <span class="tp">FreeShipping</span>());
+svc.<span class="mth">QuoteShipping</span>(shipment);                    <span class="cmt">// [Gratuit]  → 0 RON</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="sub"><span class="dot"></span>Strategy în C# modern — Func&lt;T,TResult&gt;</h3>
+
+        <p>Pentru strategii fără stare proprie — algoritmi pure, doar input → output — interfața formală este boilerplate inutil. C# permite înlocuirea ei cu un delegat <code>Func&lt;T,TResult&gt;</code>, păstrând efectul Strategy fără ceremonia OO.</p>
+
+        <div class="example-box">
+          <div class="example-header">
+            <span class="example-num">Exemplul 2</span>
+            <span class="example-title">Strategy ca delegat — sortare cu comparator</span>
+          </div>
+          <div class="example-body">
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-fname">SortStrategy.cs</span>
+                <span class="code-lang-tag">C#</span>
+              </div>
+              <pre><span class="kw">public record</span> <span class="tp">Product</span>(<span class="tp">string</span> Name, <span class="tp">decimal</span> Price, <span class="tp">int</span> Stock);
+
+<span class="kw">public class</span> <span class="tp">ProductCatalog</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">List</span>&lt;<span class="tp">Product</span>&gt; _products = <span class="kw">new</span>();
+
+    <span class="kw">public void</span> <span class="mth">Add</span>(<span class="tp">Product</span> p) => _products.<span class="mth">Add</span>(p);
+
+    <span class="cmt">// Strategia este pur și simplu o funcție de comparare</span>
+    <span class="kw">public</span> <span class="tp">List</span>&lt;<span class="tp">Product</span>&gt; <span class="mth">Sorted</span>(<span class="tp">Comparison</span>&lt;<span class="tp">Product</span>&gt; compare)
+    {
+        <span class="kw">var</span> copy = _products.<span class="mth">ToList</span>();
+        copy.<span class="mth">Sort</span>(compare);
+        <span class="kw">return</span> copy;
+    }
+}
+
+<span class="kw">var</span> catalog = <span class="kw">new</span> <span class="tp">ProductCatalog</span>();
+catalog.<span class="mth">Add</span>(<span class="kw">new</span>(<span class="str">"A"</span>, <span class="num">10m</span>, <span class="num">5</span>));
+catalog.<span class="mth">Add</span>(<span class="kw">new</span>(<span class="str">"B"</span>, <span class="num">25m</span>, <span class="num">2</span>));
+catalog.<span class="mth">Add</span>(<span class="kw">new</span>(<span class="str">"C"</span>, <span class="num">15m</span>, <span class="num">8</span>));
+
+<span class="cmt">// Strategiile sunt expresii lambda — fără clase, fără interfețe</span>
+<span class="kw">var</span> byPrice = catalog.<span class="mth">Sorted</span>((a, b) =&gt; a.Price.<span class="mth">CompareTo</span>(b.Price));
+<span class="kw">var</span> byStock = catalog.<span class="mth">Sorted</span>((a, b) =&gt; b.Stock.<span class="mth">CompareTo</span>(a.Stock)); <span class="cmt">// desc</span>
+<span class="kw">var</span> byName  = catalog.<span class="mth">Sorted</span>((a, b) =&gt; <span class="tp">string</span>.<span class="mth">Compare</span>(a.Name, b.Name));</pre>
+            </div>
+            <div class="callout note">
+              <span class="callout-icon">🧭</span>
+              <div class="callout-body">
+                <div class="callout-title">Interfață sau delegat?</div>
+                <p>Folosiți <strong>interfață</strong> când strategiile au stare proprie (ex. <code>CachingStrategy</code> cu cache intern), când au mai multe metode legate (ex. <code>Apply</code> + <code>Validate</code>), sau când le înregistrați explicit în DI container. Folosiți <strong>delegat</strong> (<code>Func</code>, <code>Action</code>, <code>Comparison</code>) când strategia este o singură funcție pură, ușor de exprimat ca lambda. Ambele sunt Strategy — diferă doar în greutatea ceremoniei.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="when-grid">
+          <div class="when-card use">
+            <div class="when-card-title">✓ Când se potrivește</div>
+            Aveți mai mulți algoritmi cu același contract (calcul preț, sortare, validare, format export). Algoritmul trebuie ales la runtime din configurație, rolul utilizatorului sau context. Codul curent are un switch/if pe tip care crește la fiecare cerință nouă.
+          </div>
+          <div class="when-card avoid">
+            <div class="when-card-title">✗ Când nu se potrivește</div>
+            Există un singur algoritm și nu se prevăd alternative — adăugarea de Strategy doar pentru viitor încalcă YAGNI. Algoritmii diferă fundamental ca semnătură (input/output diferite) — atunci nu e o familie comună. Diferențele sunt mici (un parametru, o constantă) — un parametru de configurare e mai simplu.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 4: COMMAND ── -->
+  <section class="section" id="command">
+    <h2 class="stitle"><span class="num">04</span>Command</h2>
+
+    <div class="pattern-card">
+      <div class="pattern-header">
+        <span class="pattern-icon">⚡</span>
+        <div>
+          <div class="pattern-name">Command</div>
+          <div class="pattern-intent">Încapsulează o cerere ca obiect, permițând parametrizarea clienților cu diferite cereri, organizarea cererilor în cozi sau loguri și suportul pentru operații undo/redo.</div>
+          <div class="pattern-meta">
+            <span class="pattern-tag behavioral">Comportamental</span>
+            <span class="pattern-tag gof">GoF</span>
+          </div>
+        </div>
+      </div>
+      <div class="pattern-body">
+
+        <p>Ideea centrală: o operație nu este un apel direct de metodă, ci un <strong>obiect</strong> care își amintește destinatarul, parametrii și metoda de invocat. Acest obiect poate fi stocat, transmis prin rețea, plasat într-o coadă, înregistrat în log sau inversat ulterior.</p>
+
+        <h3 class="sub"><span class="dot"></span>Structura generică (GoF)</h3>
+
+        <div class="uml-wrap">
+          <div class="uml-container">
+            <div class="uml-title">Diagramă de clase</div>
+            <div class="mermaid uml-mermaid">
+classDiagram
+    class Command {
+        &lt;&lt;interface&gt;&gt;
+        +execute()
+        +undo()
+    }
+    class ConcreteCommand {
+        -receiver Receiver
+        -params
+        +execute()
+        +undo()
+    }
+    class Receiver {
+        +action()
+    }
+    class Invoker {
+        -command Command
+        +setCommand(Command)
+        +invoke()
+    }
+    class Client
+    Command <|.. ConcreteCommand
+    ConcreteCommand --> Receiver
+    Invoker o--> Command
+    Client ..> ConcreteCommand : creates
+    Client ..> Invoker : configures
+            </div>
+          </div>
+          <div class="uml-container">
+            <div class="uml-title">Diagramă de secvență</div>
+            <div class="mermaid uml-mermaid">
+sequenceDiagram
+    participant Cl as Client
+    participant I as Invoker
+    participant Cmd as ConcreteCommand
+    participant R as Receiver
+    Cl->>Cmd: new(receiver, params)
+    Cl->>I: setCommand(cmd)
+    Cl->>I: invoke()
+    I->>Cmd: execute()
+    Cmd->>R: action()
+    R-->>Cmd: rezultat
+    Cmd-->>I: ok
+            </div>
+          </div>
+        </div>
+
+        <h3 class="sub"><span class="dot"></span>Structura C# — participanți canonici</h3>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-fname">Command — structura generică</span>
+            <span class="code-lang-tag">C#</span>
+          </div>
+          <pre><span class="cmt">// Command — interfața comună; Undo() e opțional</span>
+<span class="kw">public interface</span> <span class="ifc">ICommand</span>
+{
+    <span class="kw">void</span> <span class="mth">Execute</span>();
+    <span class="kw">void</span> <span class="mth">Undo</span>();
+}
+
+<span class="cmt">// Receiver — obiectul care face munca reală</span>
+<span class="kw">public class</span> <span class="tp">Light</span>
+{
+    <span class="kw">public bool</span> <span class="prp">IsOn</span> { <span class="kw">get</span>; <span class="kw">private set</span>; }
+    <span class="kw">public void</span> <span class="mth">TurnOn</span>()  { <span class="prp">IsOn</span> = <span class="kw">true</span>;  <span class="tp">Console</span>.<span class="mth">WriteLine</span>(<span class="str">"💡 ON"</span>); }
+    <span class="kw">public void</span> <span class="mth">TurnOff</span>() { <span class="prp">IsOn</span> = <span class="kw">false</span>; <span class="tp">Console</span>.<span class="mth">WriteLine</span>(<span class="str">"💤 OFF"</span>); }
+}
+
+<span class="cmt">// ConcreteCommand — leagă o acțiune concretă de Receiver</span>
+<span class="kw">public class</span> <span class="tp">TurnOnCommand</span> : <span class="ifc">ICommand</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">Light</span> _light;
+    <span class="kw">public</span> <span class="mth">TurnOnCommand</span>(<span class="tp">Light</span> light) => _light = light;
+
+    <span class="kw">public void</span> <span class="mth">Execute</span>() => _light.<span class="mth">TurnOn</span>();
+    <span class="kw">public void</span> <span class="mth">Undo</span>()    => _light.<span class="mth">TurnOff</span>();
+}
+
+<span class="kw">public class</span> <span class="tp">TurnOffCommand</span> : <span class="ifc">ICommand</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">Light</span> _light;
+    <span class="kw">public</span> <span class="mth">TurnOffCommand</span>(<span class="tp">Light</span> light) => _light = light;
+
+    <span class="kw">public void</span> <span class="mth">Execute</span>() => _light.<span class="mth">TurnOff</span>();
+    <span class="kw">public void</span> <span class="mth">Undo</span>()    => _light.<span class="mth">TurnOn</span>();
+}
+
+<span class="cmt">// Invoker — execută comenzi fără să știe ce fac</span>
+<span class="kw">public class</span> <span class="tp">RemoteControl</span>
+{
+    <span class="kw">private</span> <span class="ifc">ICommand</span>? _command;
+    <span class="kw">public void</span> <span class="mth">SetCommand</span>(<span class="ifc">ICommand</span> command) => _command = command;
+    <span class="kw">public void</span> <span class="mth">Press</span>()                       => _command?.<span class="mth">Execute</span>();
+}
+
+<span class="kw">var</span> light  = <span class="kw">new</span> <span class="tp">Light</span>();
+<span class="kw">var</span> remote = <span class="kw">new</span> <span class="tp">RemoteControl</span>();
+
+remote.<span class="mth">SetCommand</span>(<span class="kw">new</span> <span class="tp">TurnOnCommand</span>(light));
+remote.<span class="mth">Press</span>(); <span class="cmt">// 💡 ON</span>
+
+remote.<span class="mth">SetCommand</span>(<span class="kw">new</span> <span class="tp">TurnOffCommand</span>(light));
+remote.<span class="mth">Press</span>(); <span class="cmt">// 💤 OFF</span></pre>
+        </div>
+
+        <!-- EXAMPLE: TEXT EDITOR UNDO/REDO -->
+        <div class="example-box">
+          <div class="example-header">
+            <span class="example-num">Exemplul 1</span>
+            <span class="example-title">Editor de text — undo / redo cu istoric</span>
+          </div>
+          <div class="example-body">
+            <p>Aplicația cea mai cunoscută a Command: editorul de text cu Ctrl+Z. Fiecare modificare devine o comandă; <code>Execute()</code> aplică schimbarea, <code>Undo()</code> o inversează. Două stive (executate și anulate) susțin atât undo cât și redo.</p>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-fname">TextEditor.cs</span>
+                <span class="code-lang-tag">C#</span>
+              </div>
+              <pre><span class="cmt">// Receiver — buffer-ul textual</span>
+<span class="kw">public class</span> <span class="tp">TextDocument</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">StringBuilder</span> _buffer = <span class="kw">new</span>();
+    <span class="kw">public</span> <span class="tp">string</span> <span class="prp">Content</span> => _buffer.<span class="mth">ToString</span>();
+
+    <span class="kw">public void</span> <span class="mth">Insert</span>(<span class="tp">int</span> position, <span class="tp">string</span> text) => _buffer.<span class="mth">Insert</span>(position, text);
+    <span class="kw">public void</span> <span class="mth">Delete</span>(<span class="tp">int</span> position, <span class="tp">int</span> length) => _buffer.<span class="mth">Remove</span>(position, length);
+}
+
+<span class="kw">public interface</span> <span class="ifc">ITextCommand</span>
+{
+    <span class="kw">void</span> <span class="mth">Execute</span>();
+    <span class="kw">void</span> <span class="mth">Undo</span>();
+}
+
+<span class="cmt">// ConcreteCommand — inserare; Undo = ștergerea exact a ce s-a inserat</span>
+<span class="kw">public class</span> <span class="tp">InsertCommand</span> : <span class="ifc">ITextCommand</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">TextDocument</span> _doc;
+    <span class="kw">private readonly</span> <span class="tp">int</span>          _position;
+    <span class="kw">private readonly</span> <span class="tp">string</span>       _text;
+
+    <span class="kw">public</span> <span class="mth">InsertCommand</span>(<span class="tp">TextDocument</span> doc, <span class="tp">int</span> position, <span class="tp">string</span> text)
+        => (_doc, _position, _text) = (doc, position, text);
+
+    <span class="kw">public void</span> <span class="mth">Execute</span>() => _doc.<span class="mth">Insert</span>(_position, _text);
+    <span class="kw">public void</span> <span class="mth">Undo</span>()    => _doc.<span class="mth">Delete</span>(_position, _text.<span class="prp">Length</span>);
+}
+
+<span class="cmt">// ConcreteCommand — ștergere; Undo trebuie să rețină ce s-a șters</span>
+<span class="kw">public class</span> <span class="tp">DeleteCommand</span> : <span class="ifc">ITextCommand</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">TextDocument</span> _doc;
+    <span class="kw">private readonly</span> <span class="tp">int</span>          _position;
+    <span class="kw">private readonly</span> <span class="tp">int</span>          _length;
+    <span class="kw">private</span>          <span class="tp">string</span>?      _deletedText; <span class="cmt">// memento pentru Undo</span>
+
+    <span class="kw">public</span> <span class="mth">DeleteCommand</span>(<span class="tp">TextDocument</span> doc, <span class="tp">int</span> position, <span class="tp">int</span> length)
+        => (_doc, _position, _length) = (doc, position, length);
+
+    <span class="kw">public void</span> <span class="mth">Execute</span>()
+    {
+        _deletedText = _doc.<span class="prp">Content</span>.<span class="mth">Substring</span>(_position, _length);
+        _doc.<span class="mth">Delete</span>(_position, _length);
+    }
+    <span class="kw">public void</span> <span class="mth">Undo</span>()
+    {
+        <span class="kw">if</span> (_deletedText <span class="kw">is null</span>) <span class="kw">return</span>; <span class="cmt">// nu s-a executat încă</span>
+        _doc.<span class="mth">Insert</span>(_position, _deletedText);
+    }
+}
+
+<span class="cmt">// Invoker cu istoric — gestionează două stive</span>
+<span class="kw">public class</span> <span class="tp">CommandHistory</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">Stack</span>&lt;<span class="ifc">ITextCommand</span>&gt; _undo = <span class="kw">new</span>();
+    <span class="kw">private readonly</span> <span class="tp">Stack</span>&lt;<span class="ifc">ITextCommand</span>&gt; _redo = <span class="kw">new</span>();
+
+    <span class="kw">public void</span> <span class="mth">Run</span>(<span class="ifc">ITextCommand</span> cmd)
+    {
+        cmd.<span class="mth">Execute</span>();
+        _undo.<span class="mth">Push</span>(cmd);
+        _redo.<span class="mth">Clear</span>(); <span class="cmt">// orice acțiune nouă invalidează redo</span>
+    }
+
+    <span class="kw">public void</span> <span class="mth">Undo</span>()
+    {
+        <span class="kw">if</span> (_undo.<span class="prp">Count</span> == <span class="num">0</span>) <span class="kw">return</span>;
+        <span class="kw">var</span> cmd = _undo.<span class="mth">Pop</span>();
+        cmd.<span class="mth">Undo</span>();
+        _redo.<span class="mth">Push</span>(cmd);
+    }
+
+    <span class="kw">public void</span> <span class="mth">Redo</span>()
+    {
+        <span class="kw">if</span> (_redo.<span class="prp">Count</span> == <span class="num">0</span>) <span class="kw">return</span>;
+        <span class="kw">var</span> cmd = _redo.<span class="mth">Pop</span>();
+        cmd.<span class="mth">Execute</span>();
+        _undo.<span class="mth">Push</span>(cmd);
+    }
+}
+
+<span class="kw">var</span> doc     = <span class="kw">new</span> <span class="tp">TextDocument</span>();
+<span class="kw">var</span> history = <span class="kw">new</span> <span class="tp">CommandHistory</span>();
+
+history.<span class="mth">Run</span>(<span class="kw">new</span> <span class="tp">InsertCommand</span>(doc, <span class="num">0</span>, <span class="str">"Salut"</span>));      <span class="cmt">// Salut</span>
+history.<span class="mth">Run</span>(<span class="kw">new</span> <span class="tp">InsertCommand</span>(doc, <span class="num">5</span>, <span class="str">", lume!"</span>));    <span class="cmt">// Salut, lume!</span>
+history.<span class="mth">Run</span>(<span class="kw">new</span> <span class="tp">DeleteCommand</span>(doc, <span class="num">0</span>, <span class="num">5</span>));            <span class="cmt">// , lume!</span>
+
+history.<span class="mth">Undo</span>();                                            <span class="cmt">// Salut, lume!</span>
+history.<span class="mth">Undo</span>();                                            <span class="cmt">// Salut</span>
+history.<span class="mth">Redo</span>();                                            <span class="cmt">// Salut, lume!</span>
+<span class="tp">Console</span>.<span class="mth">WriteLine</span>(doc.<span class="prp">Content</span>);                          <span class="cmt">// Salut, lume!</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="sub"><span class="dot"></span>Cele patru utilizări tipice ale Command</h3>
+
+        <div class="example-box">
+          <div class="example-header">
+            <span class="example-num">Utilizare</span>
+            <span class="example-title">Coadă de comenzi — task queue</span>
+          </div>
+          <div class="example-body">
+            <p>Comenzile sunt obiecte serializabile — pot fi puse într-o coadă, transmise pe rețea sau persistate. Un worker scoate câte una și o execută. Producătorul nu trebuie să fie online când consumatorul lucrează.</p>
+            <div class="code-block">
+              <pre><span class="kw">var</span> queue = <span class="kw">new</span> <span class="tp">Queue</span>&lt;<span class="ifc">ICommand</span>&gt;();
+
+queue.<span class="mth">Enqueue</span>(<span class="kw">new</span> <span class="tp">SendEmailCommand</span>(<span class="str">"a@b.com"</span>, <span class="str">"Salut"</span>));
+queue.<span class="mth">Enqueue</span>(<span class="kw">new</span> <span class="tp">GenerateReportCommand</span>(<span class="num">2024</span>));
+queue.<span class="mth">Enqueue</span>(<span class="kw">new</span> <span class="tp">PurgeOldLogsCommand</span>());
+
+<span class="cmt">// Worker — execută în ordine, eventual asincron, eventual cu retry</span>
+<span class="kw">while</span> (queue.<span class="mth">TryDequeue</span>(<span class="kw">out var</span> cmd))
+    cmd.<span class="mth">Execute</span>();</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="example-box">
+          <div class="example-header">
+            <span class="example-num">Utilizare</span>
+            <span class="example-title">Macro / Composite Command</span>
+          </div>
+          <div class="example-body">
+            <p>O macrocomandă este un Command care conține alte comenzi. Execute() le rulează în ordine; Undo() le anulează în ordine inversă. Combină Composite (curs 7) cu Command — frumos exemplu de pattern-uri care colaborează.</p>
+            <div class="code-block">
+              <pre><span class="kw">public class</span> <span class="tp">MacroCommand</span> : <span class="ifc">ITextCommand</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">List</span>&lt;<span class="ifc">ITextCommand</span>&gt; _commands;
+    <span class="kw">public</span> <span class="mth">MacroCommand</span>(<span class="kw">params</span> <span class="ifc">ITextCommand</span>[] commands) => _commands = commands.<span class="mth">ToList</span>();
+
+    <span class="kw">public void</span> <span class="mth">Execute</span>()
+    {
+        <span class="kw">foreach</span> (<span class="kw">var</span> c <span class="kw">in</span> _commands) c.<span class="mth">Execute</span>();
+    }
+
+    <span class="kw">public void</span> <span class="mth">Undo</span>()
+    {
+        <span class="cmt">// Anulăm în ordine inversă pentru a respecta dependențele</span>
+        <span class="kw">foreach</span> (<span class="kw">var</span> c <span class="kw">in</span> _commands.<span class="mth">AsEnumerable</span>().<span class="mth">Reverse</span>()) c.<span class="mth">Undo</span>();
+    }
+}
+
+<span class="kw">var</span> formatBlock = <span class="kw">new</span> <span class="tp">MacroCommand</span>(
+    <span class="kw">new</span> <span class="tp">InsertCommand</span>(doc, <span class="num">0</span>,  <span class="str">"&lt;b&gt;"</span>),
+    <span class="kw">new</span> <span class="tp">InsertCommand</span>(doc, <span class="num">10</span>, <span class="str">"&lt;/b&gt;"</span>)
+);
+history.<span class="mth">Run</span>(formatBlock); <span class="cmt">// o singură intrare în istoric</span>
+history.<span class="mth">Undo</span>();           <span class="cmt">// anulează ambele inserări</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout note">
+          <span class="callout-icon">🧭</span>
+          <div class="callout-body">
+            <div class="callout-title">Command în .NET — MediatR</div>
+            <p><strong>MediatR</strong> este o bibliotecă populară în ecosistemul .NET care implementează Command la nivel de aplicație: <code>IRequest&lt;TResponse&gt;</code> este Command, <code>IRequestHandler&lt;TRequest, TResponse&gt;</code> este Receiver-ul, iar <code>IMediator</code> este Invoker-ul. Când veți studia CQRS în cursul 12, veți vedea că Command + handler dedicat este chiar partea Write a CQRS.</p>
+          </div>
+        </div>
+
+        <div class="when-grid">
+          <div class="when-card use">
+            <div class="when-card-title">✓ Când se potrivește</div>
+            Aveți nevoie de undo / redo. Operațiile trebuie puse într-o coadă, persistate sau transmise pe rețea. UI-ul trebuie să asocieze butoane cu acțiuni configurabile (toolbars, shortcut-uri). Auditul cere log al fiecărei acțiuni cu posibilitatea de a o rejuca.
+          </div>
+          <div class="when-card avoid">
+            <div class="when-card-title">✗ Când nu se potrivește</div>
+            Operațiile sunt simple apeluri de metodă fără cerințe de undo, queue sau audit. Cantitatea de cod necesar pentru a încapsula fiecare operație ca obiect depășește valoarea adăugată. Echipa nu valorifică flexibilitatea introdusă (rămâne doar overhead).
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 5: ITERATOR ── -->
+  <section class="section" id="iterator">
+    <h2 class="stitle"><span class="num">05</span>Iterator</h2>
+
+    <div class="pattern-card">
+      <div class="pattern-header">
+        <span class="pattern-icon">🔁</span>
+        <div>
+          <div class="pattern-name">Iterator</div>
+          <div class="pattern-intent">Furnizează o modalitate de a accesa secvențial elementele unui obiect agregat fără a expune reprezentarea sa internă. Permite mai multe parcurgeri simultane și suportă mai multe ordini de iterare.</div>
+          <div class="pattern-meta">
+            <span class="pattern-tag behavioral">Comportamental</span>
+            <span class="pattern-tag gof">GoF</span>
+          </div>
+        </div>
+      </div>
+      <div class="pattern-body">
+
+        <p>Iterator separă <strong>traversarea</strong> de <strong>structura</strong>. Clientul cere „elementul următor", colecția decide cum îl produce — fie că în spate este un array, o listă înlănțuită, un arbore sau o conexiune la baza de date. În C#, Iterator nu este o adăugire — este integrat direct în limbaj prin <code>foreach</code>, <code>IEnumerable&lt;T&gt;</code> și <code>yield return</code>.</p>
+
+        <h3 class="sub"><span class="dot"></span>Structura generică (GoF)</h3>
+
+        <div class="uml-wrap">
+          <div class="uml-container">
+            <div class="uml-title">Diagramă de clase</div>
+            <div class="mermaid uml-mermaid">
+classDiagram
+    class Iterator {
+        &lt;&lt;interface&gt;&gt;
+        +hasNext() bool
+        +next() T
+    }
+    class Aggregate {
+        &lt;&lt;interface&gt;&gt;
+        +createIterator() Iterator
+    }
+    class ConcreteIterator {
+        -collection
+        -position
+        +hasNext()
+        +next()
+    }
+    class ConcreteAggregate {
+        -items
+        +createIterator()
+    }
+    Iterator <|.. ConcreteIterator
+    Aggregate <|.. ConcreteAggregate
+    ConcreteAggregate ..> ConcreteIterator : creates
+            </div>
+          </div>
+          <div class="uml-container">
+            <div class="uml-title">Diagramă de secvență</div>
+            <div class="mermaid uml-mermaid">
+sequenceDiagram
+    participant C as Client
+    participant A as Aggregate
+    participant It as Iterator
+    C->>A: createIterator()
+    A-->>C: iterator
+    loop cat timp hasNext()
+        C->>It: hasNext()
+        It-->>C: true
+        C->>It: next()
+        It-->>C: element
+    end
+            </div>
+          </div>
+        </div>
+
+        <h3 class="sub"><span class="dot"></span>IEnumerable / IEnumerator — Iterator în C#</h3>
+
+        <p>În .NET, <code>IEnumerable&lt;T&gt;</code> este Aggregate (poate produce un iterator) și <code>IEnumerator&lt;T&gt;</code> este Iterator (are <code>MoveNext()</code> și <code>Current</code>). Orice colecție care implementează <code>IEnumerable&lt;T&gt;</code> este compatibilă cu <code>foreach</code>, LINQ și sintaxa modernă.</p>
+
+        <div class="example-box">
+          <div class="example-header">
+            <span class="example-num">Exemplul 1</span>
+            <span class="example-title">Iterator clasic — implementare manuală pentru o colecție custom</span>
+          </div>
+          <div class="example-body">
+            <p>Pentru a înțelege ce ascunde <code>foreach</code>, scriem manual o colecție și iteratorul ei. Apoi vom vedea cum aceeași logică se reduce la câteva linii cu <code>yield return</code>.</p>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-fname">CustomCollection.cs</span>
+                <span class="code-lang-tag">C#</span>
+              </div>
+              <pre><span class="cmt">// ConcreteIterator — știe să se plimbe prin array</span>
+<span class="kw">public class</span> <span class="tp">ArrayIterator</span>&lt;<span class="tp">T</span>&gt; : <span class="ifc">IEnumerator</span>&lt;<span class="tp">T</span>&gt;
+{
+    <span class="kw">private readonly</span> <span class="tp">T</span>[] _items;
+    <span class="kw">private</span> <span class="tp">int</span> _position = -<span class="num">1</span>;
+
+    <span class="kw">public</span> <span class="mth">ArrayIterator</span>(<span class="tp">T</span>[] items) => _items = items;
+
+    <span class="kw">public</span> <span class="tp">T</span>      <span class="prp">Current</span> => _items[_position];
+    <span class="tp">object</span>? <span class="ifc">IEnumerator</span>.<span class="prp">Current</span> => <span class="prp">Current</span>;
+
+    <span class="kw">public bool</span> <span class="mth">MoveNext</span>()
+    {
+        _position++;
+        <span class="kw">return</span> _position &lt; _items.<span class="prp">Length</span>;
+    }
+
+    <span class="kw">public void</span> <span class="mth">Reset</span>()   => _position = -<span class="num">1</span>;
+    <span class="kw">public void</span> <span class="mth">Dispose</span>() { <span class="cmt">/* fără resurse de eliberat */</span> }
+}
+
+<span class="cmt">// Aggregate — colecția care expune iteratorul</span>
+<span class="kw">public class</span> <span class="tp">CustomBag</span>&lt;<span class="tp">T</span>&gt; : <span class="ifc">IEnumerable</span>&lt;<span class="tp">T</span>&gt;
+{
+    <span class="kw">private readonly</span> <span class="tp">T</span>[] _items;
+    <span class="kw">public</span> <span class="mth">CustomBag</span>(<span class="kw">params</span> <span class="tp">T</span>[] items) => _items = items;
+
+    <span class="kw">public</span> <span class="ifc">IEnumerator</span>&lt;<span class="tp">T</span>&gt; <span class="mth">GetEnumerator</span>() => <span class="kw">new</span> <span class="tp">ArrayIterator</span>&lt;<span class="tp">T</span>&gt;(_items);
+    <span class="ifc">IEnumerator</span> <span class="ifc">IEnumerable</span>.<span class="mth">GetEnumerator</span>() => <span class="mth">GetEnumerator</span>();
+}
+
+<span class="cmt">// Foreach folosește IEnumerable&lt;T&gt; transparent</span>
+<span class="kw">var</span> bag = <span class="kw">new</span> <span class="tp">CustomBag</span>&lt;<span class="tp">int</span>&gt;(<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>);
+<span class="kw">foreach</span> (<span class="kw">var</span> item <span class="kw">in</span> bag)
+    <span class="tp">Console</span>.<span class="mth">WriteLine</span>(item); <span class="cmt">// 10, 20, 30</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="sub"><span class="dot"></span>yield return — iteratorul scris automat de compilator</h3>
+
+        <p>Cuvântul cheie <code>yield return</code> îi spune compilatorului să genereze automat o clasă-iterator în spate. Tot codul scris manual mai sus se reduce la o singură metodă obișnuită cu <code>yield return</code>.</p>
+
+        <div class="compare">
+          <div class="compare-col before">
+            <div class="compare-label before">Manual — toate detaliile vizibile</div>
+            <div class="code-block">
+              <pre><span class="kw">public class</span> <span class="tp">RangeIterator</span> : <span class="ifc">IEnumerator</span>&lt;<span class="tp">int</span>&gt;
+{
+    <span class="kw">private readonly</span> <span class="tp">int</span> _start, _end;
+    <span class="kw">private</span> <span class="tp">int</span> _pos;
+
+    <span class="kw">public</span> <span class="mth">RangeIterator</span>(<span class="tp">int</span> s, <span class="tp">int</span> e)
+    { _start = s; _end = e; _pos = s - <span class="num">1</span>; }
+
+    <span class="kw">public int</span>  <span class="prp">Current</span> => _pos;
+    <span class="tp">object</span>?      <span class="ifc">IEnumerator</span>.<span class="prp">Current</span> => _pos;
+    <span class="kw">public bool</span> <span class="mth">MoveNext</span>() =&gt; ++_pos &lt;= _end;
+    <span class="kw">public void</span> <span class="mth">Reset</span>()    => _pos = _start - <span class="num">1</span>;
+    <span class="kw">public void</span> <span class="mth">Dispose</span>()  { }
+}</pre>
+            </div>
+          </div>
+          <div class="compare-col after">
+            <div class="compare-label after">Cu yield return — compilatorul face restul</div>
+            <div class="code-block">
+              <pre><span class="kw">public</span> <span class="ifc">IEnumerable</span>&lt;<span class="tp">int</span>&gt; <span class="mth">Range</span>(<span class="tp">int</span> start, <span class="tp">int</span> end)
+{
+    <span class="kw">for</span> (<span class="kw">var</span> i = start; i &lt;= end; i++)
+        <span class="kw">yield return</span> i;
+}
+
+<span class="cmt">// Compilatorul generează automat:
+//   - clasa state machine
+//   - implementarea IEnumerable&lt;int&gt;
+//   - implementarea IEnumerator&lt;int&gt;
+//   - logica de Dispose
+//   - tracking-ul stării (poziția curentă)</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout info">
+          <span class="callout-icon">💡</span>
+          <div class="callout-body">
+            <div class="callout-title">Lazy evaluation</div>
+            <p><code>yield return</code> nu execută corpul metodei imediat. Codul rulează doar când consumatorul cere următorul element prin <code>MoveNext()</code>. Asta înseamnă că o secvență poate fi <strong>infinită</strong> sau poate citi datele <strong>la cerere</strong> (din fișier, baza de date, rețea), fără a încărca totul în memorie.</p>
+          </div>
+        </div>
+
+        <!-- EXAMPLE: TREE TRAVERSAL -->
+        <div class="example-box">
+          <div class="example-header">
+            <span class="example-num">Exemplul 2</span>
+            <span class="example-title">Arbore binar — același arbore, trei ordini de parcurgere</span>
+          </div>
+          <div class="example-body">
+            <p>Forța Iterator se vede când aceeași structură suportă mai multe parcurgeri. Un arbore binar poate fi parcurs <em>inordine</em> (stânga → rădăcină → dreapta — produce elementele sortate dacă arborele este un Binary Search Tree), <em>preordine</em> (rădăcină întâi) sau <em>BFS</em> (pe niveluri). Clientul nu vede recursivitatea sau coada — doar primește elementele.</p>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-fname">BinaryTree.cs</span>
+                <span class="code-lang-tag">C#</span>
+              </div>
+              <pre><span class="kw">public class</span> <span class="tp">TreeNode</span>&lt;<span class="tp">T</span>&gt;
+{
+    <span class="kw">public</span> <span class="tp">T</span> <span class="prp">Value</span> { <span class="kw">get</span>; }
+    <span class="kw">public</span> <span class="tp">TreeNode</span>&lt;<span class="tp">T</span>&gt;? <span class="prp">Left</span>  { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="tp">TreeNode</span>&lt;<span class="tp">T</span>&gt;? <span class="prp">Right</span> { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="mth">TreeNode</span>(<span class="tp">T</span> value) => <span class="prp">Value</span> = value;
+}
+
+<span class="kw">public class</span> <span class="tp">BinaryTree</span>&lt;<span class="tp">T</span>&gt;
+{
+    <span class="kw">public</span> <span class="tp">TreeNode</span>&lt;<span class="tp">T</span>&gt;? <span class="prp">Root</span> { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="cmt">// Inordine: stânga → rădăcină → dreapta</span>
+    <span class="kw">public</span> <span class="ifc">IEnumerable</span>&lt;<span class="tp">T</span>&gt; <span class="prp">InOrder</span>     => <span class="mth">TraverseInOrder</span>(<span class="prp">Root</span>);
+    <span class="kw">private</span> <span class="ifc">IEnumerable</span>&lt;<span class="tp">T</span>&gt; <span class="mth">TraverseInOrder</span>(<span class="tp">TreeNode</span>&lt;<span class="tp">T</span>&gt;? n)
+    {
+        <span class="kw">if</span> (n <span class="kw">is null</span>) <span class="kw">yield break</span>;
+        <span class="kw">foreach</span> (<span class="kw">var</span> v <span class="kw">in</span> <span class="mth">TraverseInOrder</span>(n.<span class="prp">Left</span>))  <span class="kw">yield return</span> v;
+        <span class="kw">yield return</span> n.<span class="prp">Value</span>;
+        <span class="kw">foreach</span> (<span class="kw">var</span> v <span class="kw">in</span> <span class="mth">TraverseInOrder</span>(n.<span class="prp">Right</span>)) <span class="kw">yield return</span> v;
+    }
+
+    <span class="cmt">// Preordine: rădăcină → stânga → dreapta</span>
+    <span class="kw">public</span> <span class="ifc">IEnumerable</span>&lt;<span class="tp">T</span>&gt; <span class="prp">PreOrder</span>    => <span class="mth">TraversePreOrder</span>(<span class="prp">Root</span>);
+    <span class="kw">private</span> <span class="ifc">IEnumerable</span>&lt;<span class="tp">T</span>&gt; <span class="mth">TraversePreOrder</span>(<span class="tp">TreeNode</span>&lt;<span class="tp">T</span>&gt;? n)
+    {
+        <span class="kw">if</span> (n <span class="kw">is null</span>) <span class="kw">yield break</span>;
+        <span class="kw">yield return</span> n.<span class="prp">Value</span>;
+        <span class="kw">foreach</span> (<span class="kw">var</span> v <span class="kw">in</span> <span class="mth">TraversePreOrder</span>(n.<span class="prp">Left</span>))  <span class="kw">yield return</span> v;
+        <span class="kw">foreach</span> (<span class="kw">var</span> v <span class="kw">in</span> <span class="mth">TraversePreOrder</span>(n.<span class="prp">Right</span>)) <span class="kw">yield return</span> v;
+    }
+
+    <span class="cmt">// BFS: nivel cu nivel — folosește o coadă, nu recursivitate</span>
+    <span class="kw">public</span> <span class="ifc">IEnumerable</span>&lt;<span class="tp">T</span>&gt; <span class="prp">BreadthFirst</span>
+    {
+        <span class="kw">get</span>
+        {
+            <span class="kw">if</span> (<span class="prp">Root</span> <span class="kw">is null</span>) <span class="kw">yield break</span>;
+            <span class="kw">var</span> queue = <span class="kw">new</span> <span class="tp">Queue</span>&lt;<span class="tp">TreeNode</span>&lt;<span class="tp">T</span>&gt;&gt;();
+            queue.<span class="mth">Enqueue</span>(<span class="prp">Root</span>);
+            <span class="kw">while</span> (queue.<span class="prp">Count</span> &gt; <span class="num">0</span>)
+            {
+                <span class="kw">var</span> node = queue.<span class="mth">Dequeue</span>();
+                <span class="kw">yield return</span> node.<span class="prp">Value</span>;
+                <span class="kw">if</span> (node.<span class="prp">Left</span>  <span class="kw">is not null</span>) queue.<span class="mth">Enqueue</span>(node.<span class="prp">Left</span>);
+                <span class="kw">if</span> (node.<span class="prp">Right</span> <span class="kw">is not null</span>) queue.<span class="mth">Enqueue</span>(node.<span class="prp">Right</span>);
+            }
+        }
+    }
+}
+
+<span class="cmt">// Construim arborele:        4
+//                          /   \
+//                         2     6
+//                        / \   / \
+//                       1   3 5   7</span>
+<span class="kw">var</span> tree = <span class="kw">new</span> <span class="tp">BinaryTree</span>&lt;<span class="tp">int</span>&gt;
+{
+    <span class="prp">Root</span> = <span class="kw">new</span>(<span class="num">4</span>)
+    {
+        <span class="prp">Left</span>  = <span class="kw">new</span>(<span class="num">2</span>) { <span class="prp">Left</span> = <span class="kw">new</span>(<span class="num">1</span>), <span class="prp">Right</span> = <span class="kw">new</span>(<span class="num">3</span>) },
+        <span class="prp">Right</span> = <span class="kw">new</span>(<span class="num">6</span>) { <span class="prp">Left</span> = <span class="kw">new</span>(<span class="num">5</span>), <span class="prp">Right</span> = <span class="kw">new</span>(<span class="num">7</span>) }
+    }
+};
+
+<span class="cmt">// Aceeași structură, trei parcurgeri — clientul folosește foreach uniform</span>
+<span class="tp">Console</span>.<span class="mth">WriteLine</span>(<span class="tp">string</span>.<span class="mth">Join</span>(<span class="str">", "</span>, tree.<span class="prp">InOrder</span>));      <span class="cmt">// 1, 2, 3, 4, 5, 6, 7</span>
+<span class="tp">Console</span>.<span class="mth">WriteLine</span>(<span class="tp">string</span>.<span class="mth">Join</span>(<span class="str">", "</span>, tree.<span class="prp">PreOrder</span>));     <span class="cmt">// 4, 2, 1, 3, 6, 5, 7</span>
+<span class="tp">Console</span>.<span class="mth">WriteLine</span>(<span class="tp">string</span>.<span class="mth">Join</span>(<span class="str">", "</span>, tree.<span class="prp">BreadthFirst</span>)); <span class="cmt">// 4, 2, 6, 1, 3, 5, 7</span>
+
+<span class="cmt">// Bonus: LINQ funcționează fără efort</span>
+<span class="kw">var</span> evenInOrder = tree.<span class="prp">InOrder</span>.<span class="mth">Where</span>(x => x % <span class="num">2</span> == <span class="num">0</span>); <span class="cmt">// 2, 4, 6</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="sub"><span class="dot"></span>Iterator infinit și lazy</h3>
+
+        <p>Pentru că <code>yield return</code> este lazy, putem defini secvențe care nu pot exista în memorie ca atare. Consumatorul oprește iterarea oricând — generarea pur și simplu se oprește.</p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-fname">Fibonacci.cs</span>
+            <span class="code-lang-tag">C#</span>
+          </div>
+          <pre><span class="cmt">// Secvență infinită — nu va termina niciodată singură</span>
+<span class="kw">public static</span> <span class="ifc">IEnumerable</span>&lt;<span class="tp">long</span>&gt; <span class="mth">Fibonacci</span>()
+{
+    <span class="tp">long</span> a = <span class="num">0</span>, b = <span class="num">1</span>;
+    <span class="kw">while</span> (<span class="kw">true</span>)
+    {
+        <span class="kw">yield return</span> a;
+        (a, b) = (b, a + b);
+    }
+}
+
+<span class="cmt">// Take(10) îi cere doar primele 10 — restul nu e generat niciodată</span>
+<span class="kw">var</span> first10 = <span class="mth">Fibonacci</span>().<span class="mth">Take</span>(<span class="num">10</span>);
+<span class="tp">Console</span>.<span class="mth">WriteLine</span>(<span class="tp">string</span>.<span class="mth">Join</span>(<span class="str">", "</span>, first10));
+<span class="cmt">// 0, 1, 1, 2, 3, 5, 8, 13, 21, 34</span></pre>
+        </div>
+
+        <div class="when-grid">
+          <div class="when-card use">
+            <div class="when-card-title">✓ Când se potrivește</div>
+            Doriți ca o colecție custom să suporte foreach și LINQ. Aveți mai multe ordini de parcurgere pentru aceeași structură (arbori, grafuri). Sursa de date este lazy sau infinită (stream-uri, fișiere mari, generatoare). Vreți să separați traversarea de structura internă a colecției.
+          </div>
+          <div class="when-card avoid">
+            <div class="when-card-title">✗ Când nu se potrivește</div>
+            Pentru o colecție trivială (array, <code>List&lt;T&gt;</code> direct expusă) — nu e nevoie să implementați un iterator custom, cele native sunt suficiente. Aveți nevoie de acces aleator la elemente (index, hash) — Iterator e doar secvențial. Performanța în loop fierbinte e critică — overhead-ul state machine-ului din yield poate fi măsurabil.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 6: COMPARATIE ── -->
+  <section class="section" id="comparatie">
+    <h2 class="stitle"><span class="num">06</span>Comparație — cele 4 pattern-uri de astăzi</h2>
+
+    <table class="patterns-overview">
+      <thead>
+        <tr><th>Pattern</th><th>Problema rezolvată</th><th>Cuvânt cheie</th><th>Relație SOLID</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="pat-name">Observer</span></td>
+          <td>Notifică automat dependenți la schimbări de stare</td>
+          <td>publish/subscribe</td>
+          <td>OCP, DIP</td>
+        </tr>
+        <tr>
+          <td><span class="pat-name">Strategy</span></td>
+          <td>Schimbă algoritmul fără a modifica clientul</td>
+          <td>algoritm interschimbabil</td>
+          <td>OCP, SRP</td>
+        </tr>
+        <tr>
+          <td><span class="pat-name">Command</span></td>
+          <td>Operația devine obiect — undo, queue, log, retry</td>
+          <td>cerere reificată</td>
+          <td>SRP, OCP</td>
+        </tr>
+        <tr>
+          <td><span class="pat-name">Iterator</span></td>
+          <td>Traversare uniformă fără a expune structura</td>
+          <td>parcurgere</td>
+          <td>SRP, ISP</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="cquote">
+      Tema comună a celor patru pattern-uri este <em>decuplarea responsabilităților</em>: Observer decuplează cine știe că s-a întâmplat ceva de cine acționează; Strategy decuplează codul care folosește un algoritm de algoritm însuși; Command decuplează cine cere de cine execută; Iterator decuplează cine parcurge de cum este stocat.
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">🔗</span>
+      <div class="callout-body">
+        <div class="callout-title">În cursul următor</div>
+        <p>Curs 9 continuă cu <strong>Template Method</strong> (algoritm cu pași variabili în subclase), <strong>Chain of Responsibility</strong> (lanț de handler-i — baza ASP.NET Core middleware), <strong>State</strong> (comportament dependent de stare cu tranziții explicite) și o trecere conceptuală prin <strong>Mediator</strong> și <strong>Visitor</strong>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 7: LAB ── -->
+  <section class="section" id="lab">
+    <h2 class="stitle"><span class="num">07</span>Laborator 8</h2>
+
+    <p>Un music player desktop funcțional — <strong>MusicPlayer</strong> — care redă fișiere audio reale (MP3, WAV) folosind <code>NAudio</code>. Aplicația integrează cele trei pattern-uri studiate astăzi în rolurile lor naturale dintr-o aplicație WPF modernă: <em>Strategy</em> alege track-ul următor, <em>Command</em> încapsulează acțiunile cu undo/redo, <em>Observer</em> propagă schimbările către UI, log și statistici.</p>
+
+    <div class="lab-box">
+      <div class="lab-header">
+        <span class="lab-header-icon">🔬</span>
+        <div class="lab-header-text">
+          <h4>MusicPlayer — desktop audio player</h4>
+          <p>Laborator 8 — Observer + Strategy + Command pe o aplicație WPF cu NAudio</p>
+        </div>
+      </div>
+      <div class="lab-body">
+
+        <p>Stack tehnologic: <code>C# 12 / .NET 8</code>, <code>WPF</code> pentru UI, <code>NAudio 2.x</code> pentru redare audio (NuGet: <code>NAudio</code>), arhitectură <code>MVVM</code>. Studentul construiește o aplicație completă pornind de la modelul de domeniu, integrând progresiv cele trei pattern-uri în straturile potrivite.</p>
+
+        <h3 class="sub"><span class="dot"></span>Mapping pattern → rol în aplicație</h3>
+
+        <table class="patterns-overview">
+          <thead>
+            <tr><th>Pattern</th><th>Rol concret</th><th>Realizare practică</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="pat-name">Observer</span></td>
+              <td>Player-ul publică schimbări de stare; UI-ul, log-ul și statisticile reacționează independent</td>
+              <td><code>INotifyPropertyChanged</code> + event-uri custom</td>
+            </tr>
+            <tr>
+              <td><span class="pat-name">Command</span></td>
+              <td>Fiecare acțiune utilizator (Play, Pause, Skip, AddTrack…) este un obiect</td>
+              <td><code>ICommand</code> + istoric pentru Undo/Redo</td>
+            </tr>
+            <tr>
+              <td><span class="pat-name">Strategy</span></td>
+              <td>Modul de selectare a track-ului următor variază (sequential, shuffle, smart)</td>
+              <td><code>IPlaybackStrategy</code> interschimbabilă la runtime</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="lab-section">
+          <div class="lab-section-title">Cerințe</div>
+
+          <div class="lab-req">
+            <div class="lab-req-header">
+              <span class="lab-req-badge" style="background:rgba(255,166,87,.12);color:var(--orange);">DOMAIN</span>
+              <span class="lab-req-title">Cerința 1 — Modelul de domeniu</span>
+            </div>
+            <div class="lab-req-body">
+              <ul>
+                <li><code>Track</code> — Value Object imutabil (<code>record</code>) cu <code>Id</code>, <code>Title</code>, <code>Artist</code>, <code>Album</code>, <code>Duration</code>, <code>FilePath</code></li>
+                <li><code>Playlist</code> — clasă mutabilă cu <code>ObservableCollection&lt;Track&gt;</code>; accesul la track-uri doar prin metode (<code>Add</code>, <code>Remove</code>, <code>Move</code>, <code>Clear</code>) — nu se expune lista direct</li>
+                <li>Citirea metadata din MP3 cu NAudio: <code>using var reader = new Mp3FileReader(path); var duration = reader.TotalTime;</code></li>
+                <li><code>PlayerState</code> — enum cu <code>Stopped</code>, <code>Playing</code>, <code>Paused</code></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="lab-req">
+            <div class="lab-req-header">
+              <span class="lab-req-badge" style="background:rgba(88,166,255,.15);color:var(--accent2);">NAUDIO</span>
+              <span class="lab-req-title">Cerința 2 — AudioPlayer (Receiver pentru NAudio)</span>
+            </div>
+            <div class="lab-req-body">
+              <ul>
+                <li>Clasa <code>AudioPlayer : INotifyPropertyChanged, IDisposable</code> încapsulează <code>IWavePlayer</code> și <code>AudioFileReader</code> din NAudio</li>
+                <li>Operații publice: <code>Load(Track)</code>, <code>Play()</code>, <code>Pause()</code>, <code>Stop()</code>, <code>Seek(TimeSpan)</code></li>
+                <li>Proprietăți observabile (cu <code>PropertyChanged</code>): <code>CurrentTrack</code>, <code>State</code>, <code>Position</code>, <code>Duration</code>, <code>Volume</code> (0.0–1.0)</li>
+                <li><code>Position</code> se actualizează printr-un <code>DispatcherTimer</code> la fiecare 200 ms și ridică <code>PropertyChanged</code></li>
+                <li>Eveniment <code>TrackEnded</code> — se ridică doar când track-ul s-a terminat <strong>natural</strong> (nu prin Stop manual) — distincția se face în <code>PlaybackStopped</code> verificând dacă <code>Position &gt;= Duration</code></li>
+                <li><code>Dispose()</code> curăță corect <code>_waveOut</code> și <code>_reader</code> — gestionarea resurselor native este obligatorie</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="lab-req">
+            <div class="lab-req-header">
+              <span class="lab-req-badge" style="background:rgba(63,185,80,.12);color:var(--green);">STRATEGY</span>
+              <span class="lab-req-title">Cerința 3 — Strategy: alegerea track-ului următor</span>
+            </div>
+            <div class="lab-req-body">
+              <ul>
+                <li>Interfața <code>IPlaybackStrategy</code> cu: <code>Name</code>, <code>GetNextTrack(playlist, currentTrack)</code>, <code>GetPreviousTrack(playlist, currentTrack)</code>, <code>Reset(playlist)</code></li>
+                <li><code>SequentialStrategy</code> — track-urile în ordinea din playlist; după ultimul → <code>null</code> sau primul (dacă <code>Repeat</code> activ)</li>
+                <li><code>ShuffleStrategy</code> — la <code>Reset()</code> generează o permutare aleatoare; parcurge permutarea în ordine; când se termină, generează una nouă (niciun track nu se repetă până nu s-au redat toate)</li>
+                <li><code>SmartShuffleStrategy</code> — ține istoric <code>Queue&lt;Track&gt;</code> al ultimelor N=5 track-uri; alege random din track-urile <strong>care nu sunt în istoric</strong>; dacă playlist-ul are sub N elemente, reduce fereastra dinamic</li>
+                <li><code>RepeatOneStrategy</code> — <code>GetNextTrack()</code> întoarce mereu <code>currentTrack</code></li>
+                <li>Strategia este injectată prin constructor în <code>PlaybackController</code> și schimbabilă la runtime cu <code>SetStrategy()</code> — schimbarea NU întrerupe redarea curentă</li>
+                <li>Fiecare strategie are stare proprie (permutare, istoric) și este testabilă izolat, fără player real</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="lab-req">
+            <div class="lab-req-header">
+              <span class="lab-req-badge" style="background:rgba(188,140,255,.12);color:var(--purple);">COMMAND</span>
+              <span class="lab-req-title">Cerința 4 — Command: acțiunile utilizatorului</span>
+            </div>
+            <div class="lab-req-body">
+              <ul>
+                <li>Interfața <code>IPlayerCommand</code> cu: <code>Execute()</code>, <code>Undo()</code>, <code>CanUndo</code> (bool), <code>Description</code> (string pentru afișare în history UI)</li>
+                <li>Comenzi de control (NU sunt undoable): <code>PlayCommand</code>, <code>PauseCommand</code>, <code>NextCommand</code>, <code>PreviousCommand</code> — <code>CanUndo == false</code></li>
+                <li>Comenzi care modifică playlist-ul (sunt undoable): <code>AddTrackCommand</code>, <code>RemoveTrackCommand</code>, <code>MoveTrackCommand</code>, <code>ClearPlaylistCommand</code>, <code>ChangeStrategyCommand</code></li>
+                <li><code>RemoveTrackCommand.Undo()</code> reinserează track-ul la <strong>poziția originală</strong> (nu la sfârșit) — Memento pentru index și referință</li>
+                <li><code>ClearPlaylistCommand.Undo()</code> reface lista identic — Memento pentru întreaga colecție</li>
+                <li>Toate Command-urile primesc dependențele prin constructor (<code>AudioPlayer</code>, <code>Playlist</code>, parametri specifici) — niciun acces la singleton-uri</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="lab-req">
+            <div class="lab-req-header">
+              <span class="lab-req-badge" style="background:rgba(188,140,255,.12);color:var(--purple);">HISTORY</span>
+              <span class="lab-req-title">Cerința 5 — CommandHistory cu Undo / Redo</span>
+            </div>
+            <div class="lab-req-body">
+              <ul>
+                <li>Două stive interne: <code>_undoStack</code> și <code>_redoStack</code> de tip <code>Stack&lt;IPlayerCommand&gt;</code></li>
+                <li><code>Execute(cmd)</code> — execută comanda și o adaugă pe stiva de undo doar dacă <code>CanUndo == true</code></li>
+                <li><code>Undo()</code> — pop din undo, apelează <code>Undo()</code> pe comandă, push pe redo</li>
+                <li><code>Redo()</code> — pop din redo, apelează <code>Execute()</code>, push pe undo</li>
+                <li>Orice <code>Execute()</code> nou <strong>golește redo stack-ul</strong> — o acțiune nouă invalidează firul de redo</li>
+                <li>Comenzile non-undoable (<code>CanUndo == false</code>) trec prin <code>Execute()</code> dar NU se adaugă în stivă</li>
+                <li>Capacitate maximă 50 acțiuni în history (drop oldest la depășire)</li>
+                <li><code>CanUndo</code> și <code>CanRedo</code> expuse public pentru binding la butoane UI</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="lab-req">
+            <div class="lab-req-header">
+              <span class="lab-req-badge" style="background:rgba(88,166,255,.15);color:var(--accent2);">OBSERVER</span>
+              <span class="lab-req-title">Cerința 6 — Observer: notificări multiple, independente</span>
+            </div>
+            <div class="lab-req-body">
+              <ul>
+                <li><strong>Subiecți:</strong> <code>AudioPlayer</code> emite prin <code>INotifyPropertyChanged</code> (<code>State</code>, <code>Position</code>, <code>CurrentTrack</code>, <code>Volume</code>) și prin event <code>TrackEnded</code>; <code>Playlist</code> emite <code>CollectionChanged</code> via <code>ObservableCollection</code></li>
+                <li><strong>Observer 1 — <code>MainWindowViewModel</code>:</strong> se abonează la <code>PropertyChanged</code> pentru a actualiza progress bar, butoane, eticheta track-ului curent</li>
+                <li><strong>Observer 2 — <code>PlaybackLogger</code>:</strong> scrie în <code>playback_log.txt</code> fiecare event semnificativ (TrackStarted, TrackEnded natural, StrategyChanged) cu timestamp</li>
+                <li><strong>Observer 3 — <code>StatisticsTracker</code>:</strong> menține contoare — minute totale per artist, top 5 piese cele mai redate, număr de skip-uri (track schimbat sub 30s); expune un <code>Snapshot</code> imutabil pentru afișare</li>
+                <li><strong>Observer 4 — <code>AutoNextHandler</code>:</strong> la <code>TrackEnded</code> cere automat next track de la strategie și pornește redarea (logica de auto-play)</li>
+                <li>Observatorii se înregistrează la pornirea aplicației — NU sunt cunoscuți de <code>AudioPlayer</code></li>
+                <li>Dezabonarea la închiderea ferestrei este obligatorie (evitarea memory leaks)</li>
+                <li><code>PlaybackLogger</code> și <code>StatisticsTracker</code> pot fi adăugați/eliminați la runtime</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="lab-req">
+            <div class="lab-req-header">
+              <span class="lab-req-badge" style="background:rgba(248,81,73,.1);color:var(--red);">UI</span>
+              <span class="lab-req-title">Cerința 7 — Interfața grafică WPF</span>
+            </div>
+            <div class="lab-req-body">
+              <p style="margin:0 0 .75rem;">Layout pe trei zone: <strong>header</strong> (sus, cu Undo/Redo), <strong>corp</strong> (două coloane — library/playback stânga, player/history dreapta), <strong>transport bar</strong> (footer cu butoanele de redare):</p>
+
+              <div class="ui-mockup">
+                <div class="ui-window">
+                  <div class="ui-header">
+                    <div class="ui-app-title">🎵 Music Player</div>
+                    <div class="ui-header-actions">
+                      <span class="ui-btn-sm">↶ Undo</span>
+                      <span class="ui-btn-sm disabled">↷ Redo</span>
+                    </div>
+                  </div>
+                  <div class="ui-body">
+                    <!-- Coloana stângă -->
+                    <div class="ui-col">
+                      <div class="ui-panel">
+                        <div class="ui-panel-label">Library <span class="pl-count">· 12 tracks</span></div>
+                        <div class="ui-track-head">
+                          <span>#</span>
+                          <span>Title</span>
+                          <span style="text-align:right">Time</span>
+                        </div>
+                        <div class="ui-track">
+                          <span class="ti">1</span>
+                          <span class="tt">Imagine — John Lennon</span>
+                          <span class="td">3:01</span>
+                        </div>
+                        <div class="ui-track active">
+                          <span class="ti">▶</span>
+                          <span class="tt">Hey Jude — The Beatles</span>
+                          <span class="td">7:11</span>
+                        </div>
+                        <div class="ui-track">
+                          <span class="ti">3</span>
+                          <span class="tt">Yesterday — The Beatles</span>
+                          <span class="td">2:05</span>
+                        </div>
+                        <div class="ui-track">
+                          <span class="ti">4</span>
+                          <span class="tt">Let It Be — The Beatles</span>
+                          <span class="td">4:03</span>
+                        </div>
+                        <div class="ui-track">
+                          <span class="ti">5</span>
+                          <span class="tt">Come Together — The Beatles</span>
+                          <span class="td">4:20</span>
+                        </div>
+                        <div class="ui-add">+ Add Files…</div>
+                      </div>
+                      <div class="ui-panel">
+                        <div class="ui-panel-label">Playback Mode</div>
+                        <div class="ui-radio-group">
+                          <div class="ui-radio"><span class="dot"></span>Sequential</div>
+                          <div class="ui-radio"><span class="dot"></span>Shuffle</div>
+                          <div class="ui-radio checked"><span class="dot"></span>Smart Shuffle</div>
+                          <div class="ui-radio"><span class="dot"></span>Repeat One</div>
+                        </div>
+                      </div>
+                      <div class="ui-panel">
+                        <div class="ui-panel-label">Statistics</div>
+                        <div class="ui-stat-row"><span>Total played</span><span class="sv">1h 23m</span></div>
+                        <div class="ui-stat-row"><span>Top artist</span><span class="sv">Queen</span></div>
+                        <div class="ui-stat-row"><span>Skips</span><span class="sv">4</span></div>
+                      </div>
+                    </div>
+                    <!-- Coloana dreaptă -->
+                    <div class="ui-col">
+                      <div class="ui-panel">
+                        <div class="ui-panel-label">Now Playing</div>
+                        <div class="ui-np">
+                          <div class="ui-cover">♪♫</div>
+                          <div class="ui-np-meta">
+                            <div class="ui-np-title">Hey Jude</div>
+                            <div class="ui-np-artist">The Beatles</div>
+                            <div class="ui-np-album">The Beatles 1967–1970 · 1968</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="ui-panel">
+                        <div class="ui-panel-label">History <span class="pl-count">· last 5</span></div>
+                        <div class="ui-history">
+                          <div class="ui-hist-item first">
+                            <span class="icon">↶</span>
+                            <span class="label">Move</span>
+                            <span class="val">Track 3 → position 1</span>
+                          </div>
+                          <div class="ui-hist-item">
+                            <span class="icon"></span>
+                            <span class="label">Add</span>
+                            <span class="val">"Yesterday"</span>
+                          </div>
+                          <div class="ui-hist-item">
+                            <span class="icon"></span>
+                            <span class="label">Remove</span>
+                            <span class="val">"Something"</span>
+                          </div>
+                          <div class="ui-hist-item">
+                            <span class="icon"></span>
+                            <span class="label">Strategy</span>
+                            <span class="val">Sequential → Smart Shuffle</span>
+                          </div>
+                          <div class="ui-hist-item">
+                            <span class="icon"></span>
+                            <span class="label">Add</span>
+                            <span class="val">"Hey Jude"</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Transport bar -->
+                  <div class="ui-transport">
+                    <div class="ui-controls">
+                      <span class="ui-ctrl-btn">⏮</span>
+                      <span class="ui-ctrl-btn play">▶</span>
+                      <span class="ui-ctrl-btn">⏭</span>
+                    </div>
+                    <div class="ui-progress-wrap">
+                      <div class="ui-progress"></div>
+                      <div class="ui-time"><span>2:14</span><span>7:11</span></div>
+                    </div>
+                    <div class="ui-volume">
+                      <span>🔊</span>
+                      <div class="ui-vol-bar"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <ul>
+                <li><strong>Header bar</strong> — titlul aplicației plus butoanele <code>Undo</code> și <code>Redo</code> în dreapta sus (mereu accesibile prin Ctrl+Z / Ctrl+Y); enabled/disabled prin <code>CanUndo</code>/<code>CanRedo</code></li>
+                <li><strong>Coloana stângă, sus — Library</strong>: <code>ListView</code> cu coloane <code>#</code>, <code>Title</code>, <code>Time</code> bound la <code>Playlist.Tracks</code>; track-ul curent are background portocaliu și prefix <code>▶</code> sau <code>⏸</code> în funcție de <code>State</code>; titlul afișează contorul total — ex. „LIBRARY · 12 tracks"</li>
+                <li><strong>Coloana stângă, jos — Playback Mode</strong>: cele 4 strategii ca <code>RadioButton</code>-uri vizibile (NU dropdown ascuns) — utilizatorul vede instant care e activă; selectarea declanșează <code>ChangeStrategyCommand</code></li>
+                <li><strong>Coloana stângă, jos — Statistics</strong>: panou cu valori aliniate (label-uri stânga, valori dreapta) bound la <code>StatisticsTracker.Snapshot</code> — total ascultat, top artist, număr skip-uri</li>
+                <li><strong>Coloana dreaptă, sus — Now Playing</strong>: zonă centrată cu placeholder pentru album cover (130×130 px, fundal generat dacă nu există artwork), urmată de 3 linii — <em>titlu</em> (font mare, bold), <em>artist</em> (font mediu), <em>album · an</em> (font mic, secundar)</li>
+                <li><strong>Coloana dreaptă, jos — History</strong>: listă cronologică a ultimelor 5–10 acțiuni undoable (cea mai recentă în vârf, marcată cu <code>↶</code> și clickabilă pentru Undo individual); afișează <code>Description</code> din <code>IPlayerCommand</code></li>
+                <li><strong>Footer transport bar</strong> — bandă fixă jos cu trei grupuri vizuale separate: butoane (<code>⏮</code> Previous, <code>▶</code>/<code>⏸</code> Play-Pause, <code>⏭</code> Next), apoi <code>Slider</code> de progres bidirecțional cu eticheta <code>mm:ss / mm:ss</code>, apoi <code>Slider</code> de volum 0–100 cu icon <code>🔊</code></li>
+                <li><strong>Add Files button</strong> sub Library — deschide <code>OpenFileDialog</code> (filter <code>*.mp3;*.wav</code>), citește metadata cu NAudio și declanșează <code>AddTrackCommand</code> pentru fiecare fișier selectat</li>
+                <li><strong>Toate butoanele</strong> leagă la <code>ICommand</code> (NU evenimente <code>Click</code>); <code>CanExecute</code> dezactivează vizual butoanele când acțiunea nu are sens (ex. Next dezactivat dacă playlist gol)</li>
+                <li><strong>Styling</strong>: paletă consistentă (dark sau light, la alegere), iconițe Unicode sau <code>MahApps.Metro.IconPacks</code>, padding generos între panouri, separatori clari între secțiuni</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="lab-section">
+          <div class="lab-section-title">Structura soluției</div>
+          <div class="structure-tree">
+<span class="st-folder">MusicPlayer.sln</span>
+└── <span class="st-folder">src/</span>
+    └── <span class="st-folder">MusicPlayer/</span>
+        ├── <span class="st-folder">Models/</span>
+        │   ├── <span class="st-file">Track.cs</span>
+        │   ├── <span class="st-file">Playlist.cs</span>
+        │   └── <span class="st-file">PlayerState.cs</span>
+        ├── <span class="st-folder">Audio/</span>             <span class="st-comment">← NAudio wrapper (Receiver)</span>
+        │   ├── <span class="st-file">AudioPlayer.cs</span>
+        │   └── <span class="st-file">Mp3MetadataReader.cs</span>
+        ├── <span class="st-folder">Strategies/</span>        <span class="st-comment">← Strategy</span>
+        │   ├── <span class="st-file">IPlaybackStrategy.cs</span>
+        │   ├── <span class="st-file">SequentialStrategy.cs</span>
+        │   ├── <span class="st-file">ShuffleStrategy.cs</span>
+        │   ├── <span class="st-file">SmartShuffleStrategy.cs</span>
+        │   └── <span class="st-file">RepeatOneStrategy.cs</span>
+        ├── <span class="st-folder">Commands/</span>          <span class="st-comment">← Command + Invoker</span>
+        │   ├── <span class="st-file">IPlayerCommand.cs</span>
+        │   ├── <span class="st-file">PlayCommand.cs</span>
+        │   ├── <span class="st-file">PauseCommand.cs</span>
+        │   ├── <span class="st-file">NextCommand.cs</span>
+        │   ├── <span class="st-file">PreviousCommand.cs</span>
+        │   ├── <span class="st-file">AddTrackCommand.cs</span>
+        │   ├── <span class="st-file">RemoveTrackCommand.cs</span>
+        │   ├── <span class="st-file">MoveTrackCommand.cs</span>
+        │   ├── <span class="st-file">ClearPlaylistCommand.cs</span>
+        │   ├── <span class="st-file">ChangeStrategyCommand.cs</span>
+        │   └── <span class="st-file">CommandHistory.cs</span>
+        ├── <span class="st-folder">Observers/</span>         <span class="st-comment">← Observer</span>
+        │   ├── <span class="st-file">PlaybackLogger.cs</span>
+        │   ├── <span class="st-file">StatisticsTracker.cs</span>
+        │   └── <span class="st-file">AutoNextHandler.cs</span>
+        ├── <span class="st-folder">Controllers/</span>
+        │   └── <span class="st-file">PlaybackController.cs</span>   <span class="st-comment">← orchestrează totul</span>
+        ├── <span class="st-folder">ViewModels/</span>
+        │   └── <span class="st-file">MainWindowViewModel.cs</span>
+        ├── <span class="st-folder">Views/</span>
+        │   └── <span class="st-file">MainWindow.xaml</span>
+        └── <span class="st-file">App.xaml</span>
+          </div>
+        </div>
+
+        <div class="lab-section">
+          <div class="lab-section-title">Bonus opțional</div>
+          <div class="lab-req">
+            <div class="lab-req-header">
+              <span class="lab-req-badge" style="background:rgba(255,166,87,.12);color:var(--orange);">+EXTRA</span>
+              <span class="lab-req-title">Idei pentru extinderi</span>
+            </div>
+            <div class="lab-req-body">
+              <ul>
+                <li><strong>Equalizer</strong> — Strategy adițională cu profile audio (Bass Boost, Vocal, Flat) folosind <code>BiQuadFilter</code> din NAudio</li>
+                <li><strong>Search box</strong> — filtrare playlist după titlu/artist (trigger pe <code>TextChanged</code>)</li>
+                <li><strong>Drag &amp; drop</strong> fișiere MP3 direct peste fereastră (fără <code>OpenFileDialog</code>)</li>
+                <li><strong>Persistență</strong> — salvare playlist în JSON la închidere și încărcare la pornire</li>
+                <li><strong>Visualizer audio real</strong> — folosind <code>WaveformRenderer</code> din NAudio pentru a desena waveform-ul curent</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-deliverable">
+          <div class="lab-deliverable-title">📦 Livrabil</div>
+          <p>Repository GitHub — <code>map-lab-musicplayer-&lt;nume&gt;</code>. <code>README.md</code> cu: minim 3 screenshot-uri (Now Playing, Strategy schimbată, History panel), diagrama de clase pentru cele 3 pattern-uri (Mermaid), diagrama de secvență pentru fluxul „User apasă Skip → Strategy decide → Player redă next" (Mermaid), instrucțiuni de rulare. Folder <code>samples/</code> cu 5 fișiere MP3 (free-license, ex. de pe freemusicarchive.org) pentru test. Aplicația rulează cu <code>dotnet run</code> și redă fișierele audio reale.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- QUESTIONS -->
+  <div class="questions-box">
+    <div class="questions-title">💬 Teme de Discuție</div>
+    <ol>
+      <li>Observer cu events native C# este foarte concis, dar introduce riscul de memory leak dacă subscriberi nu se dezabonează. În ce situații preferați totuși events față de implementarea manuală cu <code>List&lt;IObserver&gt;</code> și de ce?</li>
+      <li>Strategy implementat cu interfață vs. Strategy implementat cu <code>Func&lt;T, TResult&gt;</code> — argumentați alegerea pentru două scenarii concrete: o strategie de calcul preț în e-commerce și un comparator pentru sortare.</li>
+      <li>Command cu undo pare elegant, dar undo-ul real în aplicații (editoare grafice, IDE-uri) este notoriu complicat. Care sunt limitările pe care le-ați întâlni încercând să implementați undo pentru o operație de „redenumire fișier într-un sistem partajat"?</li>
+      <li>Iterator cu <code>yield return</code> este lazy — codul de generare rulează doar la cerere. Ce capcane apar dacă un <code>yield return</code> citește dintr-o resursă (fișier, conexiune DB) și consumatorul abandonează iterarea pe la jumătate? Cum protejează <code>using</code> din <code>foreach</code> împotriva acestor situații?</li>
+    </ol>
+  </div>
+
+  <!-- RESOURCES -->
+  <div class="resources">
+    <div class="resources-title">Resurse</div>
+    <div class="resource-list">
+      <div class="resource-item">Design Patterns: Elements of Reusable Object-Oriented Software — Gamma, Helm, Johnson, Vlissides (GoF), cap. Behavioral Patterns</div>
+      <div class="resource-item">refactoring.guru/design-patterns/observer — Observer cu exemple C# și diagrame interactive</div>
+      <div class="resource-item">refactoring.guru/design-patterns/strategy — Strategy ilustrat pas cu pas</div>
+      <div class="resource-item">refactoring.guru/design-patterns/command — Command cu undo și exemplu de macro</div>
+      <div class="resource-item">docs.microsoft.com — Iterators (C# Programming Guide), yield statement</div>
+      <div class="resource-item">Reactive Extensions for .NET (Rx.NET) — github.com/dotnet/reactive — Observer dus la nivel de framework</div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+  window.addEventListener('scroll', () => {
+    const el = document.documentElement;
+    document.getElementById('scroll-prog').style.transform =
+      'scaleX(' + (el.scrollTop / (el.scrollHeight - el.clientHeight)) + ')';
+  });
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.sidebar-link[href^="#"]');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector('.sidebar-link[href="#' + e.target.id + '"]');
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        background: '#161b22',
+        primaryColor: '#1c2128',
+        primaryTextColor: '#e6edf3',
+        primaryBorderColor: '#3d4450',
+        lineColor: '#8b949e',
+        secondaryColor: '#0d1117',
+        actorBkg: '#1c2128',
+        actorBorder: '#3d4450',
+        actorTextColor: '#e6edf3',
+        signalColor: '#79c0ff',
+        signalTextColor: '#e6edf3',
+        labelBoxBkgColor: '#1c2128',
+        labelBoxBorderColor: '#3d4450',
+        labelTextColor: '#e6edf3',
+        noteBkgColor: '#2a1f0a',
+        noteBorderColor: '#4a3400',
+        noteTextColor: '#ffa657',
+        classText: '#e6edf3',
+        edgeLabelBackground: '#161b22',
+      },
+      sequence: { actorFontSize: 13, messageFontSize: 12, mirrorActors: false },
+      classDiagram: { fontSize: 13 }
+    });
+  });
+</script>
+</body>
+</html>

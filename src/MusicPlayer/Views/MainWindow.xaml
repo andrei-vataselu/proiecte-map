@@ -1,0 +1,297 @@
+<Window x:Class="MusicPlayer.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:MusicPlayer.ViewModels"
+        Title="Music Player"
+        Width="1180"
+        Height="760"
+        MinWidth="960"
+        MinHeight="640"
+        Background="{StaticResource BgBrush}"
+        Foreground="{StaticResource TextBrush}"
+        FontFamily="Segoe UI"
+        x:Name="Root">
+    <Window.Resources>
+        <Style x:Key="HeaderButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource Bg3Brush}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style x:Key="DashedButtonStyle" TargetType="Button" BasedOn="{StaticResource HeaderButtonStyle}">
+            <Setter Property="BorderBrush" Value="{StaticResource Text2Brush}"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
+        <Style x:Key="TransportButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource Bg3Brush}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="22">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="PlayButtonStyle" TargetType="Button" BasedOn="{StaticResource TransportButtonStyle}">
+            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="FontSize" Value="18"/>
+        </Style>
+    </Window.Resources>
+    <Window.DataContext>
+        <vm:MainWindowViewModel/>
+    </Window.DataContext>
+    <Window.InputBindings>
+        <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoCommand}"/>
+        <KeyBinding Key="Y" Modifiers="Control" Command="{Binding RedoCommand}"/>
+    </Window.InputBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{StaticResource Bg2Brush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="20,14">
+            <Grid>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="🎵" FontSize="20" Margin="0,0,10,0"/>
+                    <TextBlock Text="Music Player" FontSize="18" FontWeight="SemiBold"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="↶ Anulează" Padding="14,8" Margin="0,0,8,0"
+                            Command="{Binding UndoCommand}" Style="{StaticResource HeaderButtonStyle}"/>
+                    <Button Content="↷ Refă" Padding="14,8"
+                            Command="{Binding RedoCommand}" Style="{StaticResource HeaderButtonStyle}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.1*"/>
+                <ColumnDefinition Width="16"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0">
+                <Border Background="{StaticResource Bg2Brush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14" Margin="0,0,0,12">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,10">
+                            <TextBlock Text="{Binding LibraryHeader}" FontWeight="SemiBold" FontSize="12"/>
+                        </Grid>
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="32"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="52"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="#" Grid.Column="0" Foreground="{StaticResource Text2Brush}" FontSize="11"/>
+                            <TextBlock Text="TITLU" Grid.Column="1" Foreground="{StaticResource Text2Brush}" FontSize="11"/>
+                            <TextBlock Text="TIMP" Grid.Column="2" HorizontalAlignment="Right" Foreground="{StaticResource Text2Brush}" FontSize="11"/>
+                        </Grid>
+                        <ScrollViewer MaxHeight="260" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding TrackRows}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="0,2" Padding="6,8" CornerRadius="6" Cursor="Hand"
+                                                Background="Transparent">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                                            <Setter Property="Background" Value="#3A2A14"/>
+                                                        </DataTrigger>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Background" Value="#1C2128"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <Border.InputBindings>
+                                                <MouseBinding MouseAction="LeftDoubleClick"
+                                                              Command="{Binding DataContext.PlayTrackCommand, ElementName=Root}"
+                                                              CommandParameter="{Binding}"/>
+                                            </Border.InputBindings>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="32"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="52"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Prefix}" Grid.Column="0" Foreground="{StaticResource OrangeBrush}"/>
+                                                <TextBlock Text="{Binding Title}" Grid.Column="1" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding DurationText}" Grid.Column="2" HorizontalAlignment="Right" Foreground="{StaticResource Text2Brush}"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                        <Button Content="+ Adaugă fișiere…" Margin="0,12,0,0" Padding="12"
+                                Command="{Binding AddFilesCommand}" Style="{StaticResource DashedButtonStyle}"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{StaticResource Bg2Brush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="MOD REDARE" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,10"/>
+                        <ItemsControl ItemsSource="{Binding Strategies}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <RadioButton Content="{Binding Name}" Margin="0,4"
+                                                 GroupName="PlaybackMode"
+                                                 IsChecked="{Binding IsSelected}"
+                                                 Command="{Binding DataContext.SelectStrategyCommand, ElementName=Root}"
+                                                 CommandParameter="{Binding}"
+                                                 Foreground="{StaticResource TextBrush}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{StaticResource Bg2Brush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14">
+                    <StackPanel>
+                        <TextBlock Text="STATISTICI" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,10"/>
+                        <Grid Margin="0,4">
+                            <TextBlock Text="Total ascultat" Foreground="{StaticResource Text2Brush}"/>
+                            <TextBlock Text="{Binding StatisticsTotal}" HorizontalAlignment="Right" FontWeight="SemiBold"/>
+                        </Grid>
+                        <Grid Margin="0,4">
+                            <TextBlock Text="Artist top" Foreground="{StaticResource Text2Brush}"/>
+                            <TextBlock Text="{Binding StatisticsTopArtist}" HorizontalAlignment="Right" FontWeight="SemiBold"/>
+                        </Grid>
+                        <Grid Margin="0,4">
+                            <TextBlock Text="Sărituri" Foreground="{StaticResource Text2Brush}"/>
+                            <TextBlock Text="{Binding StatisticsSkips}" HorizontalAlignment="Right" FontWeight="SemiBold"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2">
+                <Border Background="{StaticResource Bg2Brush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="20" Margin="0,0,0,12">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="ACUM SE REDĂ" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,16" HorizontalAlignment="Left"/>
+                        <Border Width="130" Height="130" CornerRadius="8" Margin="0,0,0,16">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#3B82F6" Offset="0"/>
+                                    <GradientStop Color="#8B5CF6" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <TextBlock Text="♪♫" FontSize="42" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{Binding NowPlayingTitle}" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center"/>
+                        <TextBlock Text="{Binding NowPlayingArtist}" FontSize="16" Foreground="{StaticResource Text2Brush}" Margin="0,6,0,0" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding NowPlayingAlbum}" FontSize="12" Foreground="{StaticResource Text2Brush}" Margin="0,4,0,0" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{StaticResource Bg2Brush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14">
+                    <StackPanel>
+                        <TextBlock Text="{Binding HistoryHeader}" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,10"/>
+                        <ItemsControl ItemsSource="{Binding HistoryEntries}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Command="{Binding DataContext.UndoHistoryEntryCommand, ElementName=Root}"
+                                            CommandParameter="{Binding}"
+                                            Background="Transparent" BorderThickness="0" Padding="4,6" HorizontalContentAlignment="Stretch">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Cursor" Value="Hand"/>
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                                                <ContentPresenter/>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsLatest}" Value="False">
+                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                        <Setter Property="Opacity" Value="0.75"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="24"/>
+                                                <ColumnDefinition Width="90"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="↶" Foreground="{StaticResource PurpleBrush}">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsLatest}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                            <TextBlock Grid.Column="1" Text="{Binding Action}" FontWeight="SemiBold"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding Detail}" Foreground="{StaticResource Text2Brush}" TextTrimming="CharacterEllipsis"/>
+                                        </Grid>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="2" Background="{StaticResource Bg2Brush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="20,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="180"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center">
+                    <Button Content="⏮" Width="44" Height="44" Margin="0,0,8,0"
+                            Command="{Binding PreviousCommand}" Style="{StaticResource TransportButtonStyle}"/>
+                    <Button Content="{Binding PlayPauseGlyph}" Width="52" Height="52" Margin="0,0,8,0"
+                            Command="{Binding PlayPauseCommand}" Style="{StaticResource PlayButtonStyle}"/>
+                    <Button Content="⏭" Width="44" Height="44"
+                            Command="{Binding NextCommand}" Style="{StaticResource TransportButtonStyle}"/>
+                </StackPanel>
+                <Grid Grid.Column="1" Margin="24,0" VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="48"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="48"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding PositionText}" VerticalAlignment="Center" Foreground="{StaticResource Text2Brush}"/>
+                    <Slider Grid.Column="1" Minimum="0" Maximum="{Binding DurationSeconds}"
+                            Value="{Binding SliderPosition, Mode=TwoWay}"
+                            PreviewMouseLeftButtonDown="OnSeekStarted"
+                            PreviewMouseLeftButtonUp="OnSeekEnded"
+                            VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="2" Text="{Binding DurationText}" HorizontalAlignment="Right"
+                               VerticalAlignment="Center" Foreground="{StaticResource Text2Brush}"/>
+                </Grid>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="🔊" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                    <Slider Minimum="0" Maximum="100" Value="{Binding VolumePercent}" Width="120"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

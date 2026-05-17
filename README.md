@@ -90,16 +90,6 @@ sequenceDiagram
     P-->>VM: PropertyChanged
 ```
 
-## Capturi ecran
-
-După rulare, fă capturi pentru:
-
-1. Panoul **Acum se redă** cu o piesă încărcată
-2. **Mod redare** cu altă strategie selectată
-3. Panoul **Istoric** după câteva acțiuni undoable
-
-Salvează imaginile în `docs/screenshots/` (opțional).
-
 ## Note
 
 - Log redare: `playback_log.txt` lângă executabil

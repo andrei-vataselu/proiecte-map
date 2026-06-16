@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OrderProcessing - Lab 4</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient" aria-hidden="true">
+    <div class="orb orb-a"></div>
+    <div class="orb orb-b"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">📦</div>
+      <div>
+        <div class="brand-title">OrderProcessing</div>
+        <div class="brand-sub">Laborator 4 - MAP</div>
+      </div>
+    </div>
+    <div class="pattern-pills">
+      <span class="pill pill-chain">Chain of Responsibility</span>
+      <span class="pill pill-state">State Pattern</span>
+    </div>
+    <div class="topbar-actions">
+      <a class="btn-ghost" href="/swagger" target="_blank" rel="noopener">
+        <span class="btn-icon">⚡</span> Swagger API
+      </a>
+      <button type="button" id="btn-new" class="btn-accent">
+        <span class="btn-icon">＋</span> Comanda noua
+      </button>
+    </div>
+  </header>
+
+  <div class="stats-strip" id="stats-strip">
+    <div class="stat-card"><span class="stat-val" id="stat-total">0</span><span class="stat-lbl">Total</span></div>
+    <div class="stat-card stat-pending"><span class="stat-val" id="stat-pending">0</span><span class="stat-lbl">Pending</span></div>
+    <div class="stat-card stat-active"><span class="stat-val" id="stat-active">0</span><span class="stat-lbl">In flux</span></div>
+    <div class="stat-card stat-done"><span class="stat-val" id="stat-delivered">0</span><span class="stat-lbl">Livrate</span></div>
+    <div class="stat-card stat-cancel"><span class="stat-val" id="stat-cancelled">0</span><span class="stat-lbl">Anulate</span></div>
+  </div>
+
+  <main class="workspace">
+    <aside class="orders-panel glass">
+      <div class="panel-toolbar">
+        <h2 class="panel-title">Comenzi</h2>
+        <span class="count-badge" id="order-count">0</span>
+      </div>
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="search" id="search" placeholder="Cauta dupa ID sau client..." autocomplete="off">
+      </div>
+      <div class="filter-chips" id="filter-chips">
+        <button type="button" class="chip active" data-filter="all">Toate</button>
+        <button type="button" class="chip" data-filter="pending">Pending</button>
+        <button type="button" class="chip" data-filter="processing">Active</button>
+        <button type="button" class="chip" data-filter="delivered">Livrate</button>
+        <button type="button" class="chip" data-filter="cancelled">Anulate</button>
+      </div>
+      <ul id="order-list" class="order-list"></ul>
+      <div id="list-empty" class="list-empty hidden">
+        <div class="empty-icon">📭</div>
+        <p>Nicio comanda inca</p>
+        <button type="button" class="btn-link" id="btn-empty-new">Creeaza prima comanda</button>
+      </div>
+    </aside>
+
+    <section class="detail-view" id="details">
+      <div class="empty-hero">
+        <div class="empty-ring">◎</div>
+        <h2>Selecteaza o comanda</h2>
+        <p>Alege din panoul din stanga sau creeaza o comanda noua pentru a vedea pipeline-ul de stari si actiunile disponibile.</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    <div class="modal-sheet glass">
+      <header class="modal-head">
+        <div>
+          <p class="modal-eyebrow">Chain of Responsibility</p>
+          <h2 id="modal-title">Comanda noua</h2>
+        </div>
+        <button type="button" class="modal-close" id="btn-cancel-modal" aria-label="Inchide">✕</button>
+      </header>
+
+      <div class="modal-steps">
+        <span class="step active">1 Client</span>
+        <span class="step-line"></span>
+        <span class="step">2 Livrare</span>
+        <span class="step-line"></span>
+        <span class="step">3 Produse</span>
+      </div>
+
+      <form id="create-form" class="modal-form">
+        <section class="form-section">
+          <h3 class="form-section-title"><span class="section-icon">👤</span> Date client</h3>
+          <div class="form-grid two">
+            <label class="field"><span>Nume complet</span><input name="name" required value="John Doe"></label>
+            <label class="field"><span>Email</span><input name="email" type="email" required value="john@example.com"></label>
+            <label class="field"><span>Varsta</span><input name="age" type="number" min="1" required value="32"></label>
+            <label class="field field-check">
+              <input name="trusted" type="checkbox" checked>
+              <span class="check-box"></span>
+              <span>Client verificat (trusted)</span>
+            </label>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h3 class="form-section-title"><span class="section-icon">📍</span> Adresa livrare</h3>
+          <div class="form-grid two">
+            <label class="field span-2"><span>Strada</span><input name="street" required value="Str. Exemplu 12"></label>
+            <label class="field"><span>Oras</span><input name="city" required value="Bucuresti"></label>
+            <label class="field"><span>Cod postal</span><input name="postal" required value="010101"></label>
+            <label class="field span-2"><span>Tara</span><input name="country" required value="Romania"></label>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="form-section-head">
+            <h3 class="form-section-title"><span class="section-icon">🛒</span> Produse</h3>
+            <button type="button" id="btn-add-item" class="btn-ghost sm">+ Adauga linie</button>
+          </div>
+          <div id="items-container" class="items-stack"></div>
+          <div class="total-bar">
+            <span>Total estimat</span>
+            <strong><span id="form-total">0</span> <small>RON</small></strong>
+          </div>
+        </section>
+
+        <div id="form-errors" class="form-errors hidden"></div>
+
+        <footer class="modal-foot">
+          <button type="button" class="btn-ghost" id="btn-modal-cancel">Anuleaza</button>
+          <button type="submit" class="btn-accent">Trimite comanda</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status">
+    <span class="toast-icon" id="toast-icon">✓</span>
+    <span id="toast-msg" class="toast-text"></span>
+    <button type="button" id="toast-close" class="toast-close" aria-label="Inchide">✕</button>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

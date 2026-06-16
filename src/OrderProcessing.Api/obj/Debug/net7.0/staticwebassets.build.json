@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "Hash": "xkQhCPRCGU/ineDe6iprq9qIkeLT3zjjk3HEGqowDk4=",
+  "Source": "OrderProcessing.Api",
+  "BasePath": "_content/OrderProcessing.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "OrderProcessing.Api\\wwwroot",
+      "Source": "OrderProcessing.Api",
+      "ContentRoot": "E:\\zzzzz\\proiecte-map\\src\\OrderProcessing.Api\\wwwroot\\",
+      "BasePath": "_content/OrderProcessing.Api",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "E:\\zzzzz\\proiecte-map\\src\\OrderProcessing.Api\\wwwroot\\app.js",
+      "SourceId": "OrderProcessing.Api",
+      "SourceType": "Discovered",
+      "ContentRoot": "E:\\zzzzz\\proiecte-map\\src\\OrderProcessing.Api\\wwwroot\\",
+      "BasePath": "_content/OrderProcessing.Api",
+      "RelativePath": "app.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\app.js"
+    },
+    {
+      "Identity": "E:\\zzzzz\\proiecte-map\\src\\OrderProcessing.Api\\wwwroot\\index.html",
+      "SourceId": "OrderProcessing.Api",
+      "SourceType": "Discovered",
+      "ContentRoot": "E:\\zzzzz\\proiecte-map\\src\\OrderProcessing.Api\\wwwroot\\",
+      "BasePath": "_content/OrderProcessing.Api",
+      "RelativePath": "index.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\index.html"
+    },
+    {
+      "Identity": "E:\\zzzzz\\proiecte-map\\src\\OrderProcessing.Api\\wwwroot\\styles.css",
+      "SourceId": "OrderProcessing.Api",
+      "SourceType": "Discovered",
+      "ContentRoot": "E:\\zzzzz\\proiecte-map\\src\\OrderProcessing.Api\\wwwroot\\",
+      "BasePath": "_content/OrderProcessing.Api",
+      "RelativePath": "styles.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\styles.css"
+    }
+  ]
+}

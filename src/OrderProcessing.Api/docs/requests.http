@@ -1,0 +1,105 @@
+@baseUrl = http://localhost:5000
+@orderId = 00000000-0000-0000-0000-000000000001
+
+###
+GET {{baseUrl}}/products
+
+###
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "customer": { "name": "Ana Pop", "email": "ana@example.com", "age": 28, "isTrusted": true },
+  "address": { "street": "Str. Florilor 5", "city": "Cluj", "postalCode": "400001", "country": "Romania" },
+  "items": [
+    {
+      "productId": "11111111-1111-1111-1111-111111111111",
+      "productName": "Laptop Pro",
+      "quantity": 1,
+      "unitPrice": 4500,
+      "hasAgeRestriction": false
+    }
+  ],
+  "total": 4500
+}
+
+###
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "customer": { "name": "Test", "email": "t@x.com", "age": 25, "isTrusted": true },
+  "address": { "street": "S1", "city": "Buc", "postalCode": "1", "country": "RO" },
+  "items": [
+    {
+      "productId": "33333333-3333-3333-3333-333333333333",
+      "productName": "Mouse wireless",
+      "quantity": 1,
+      "unitPrice": 120,
+      "hasAgeRestriction": false
+    }
+  ],
+  "total": 120
+}
+
+###
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "customer": { "name": "Minor", "email": "m@x.com", "age": 16, "isTrusted": true },
+  "address": { "street": "S1", "city": "Buc", "postalCode": "1", "country": "RO" },
+  "items": [
+    {
+      "productId": "22222222-2222-2222-2222-222222222222",
+      "productName": "Vin rosu premium",
+      "quantity": 1,
+      "unitPrice": 89,
+      "hasAgeRestriction": true
+    }
+  ],
+  "total": 89
+}
+
+###
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "customer": { "name": "Suspicios", "email": "s@x.com", "age": 30, "isTrusted": false },
+  "address": { "street": "S1", "city": "Buc", "postalCode": "1", "country": "RO" },
+  "items": [
+    {
+      "productId": "44444444-4444-4444-4444-444444444444",
+      "productName": "Placa video RTX",
+      "quantity": 2,
+      "unitPrice": 5200,
+      "hasAgeRestriction": false
+    }
+  ],
+  "total": 10400
+}
+
+###
+GET {{baseUrl}}/orders
+
+###
+GET {{baseUrl}}/orders/{{orderId}}
+
+###
+POST {{baseUrl}}/orders/{{orderId}}/pay
+
+###
+POST {{baseUrl}}/orders/{{orderId}}/process
+
+###
+POST {{baseUrl}}/orders/{{orderId}}/ship
+
+###
+POST {{baseUrl}}/orders/{{orderId}}/deliver
+
+###
+POST {{baseUrl}}/orders/{{orderId}}/cancel
+
+###
+GET {{baseUrl}}/orders/00000000-0000-0000-0000-000000000099

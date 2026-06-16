@@ -1,0 +1,28 @@
+@baseUrl = http://localhost:5000
+@memberId = aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
+@bookId = bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb
+@loanId = PASTE_LOAN_ID_FROM_BORROW_RESPONSE
+
+###
+POST {{baseUrl}}/loans/borrow
+Content-Type: application/json
+
+{
+  "memberId": "{{memberId}}",
+  "bookId": "{{bookId}}"
+}
+
+###
+GET {{baseUrl}}/loans/member/{{memberId}}
+
+###
+POST {{baseUrl}}/loans/{{loanId}}/return
+
+###
+POST {{baseUrl}}/loans/borrow
+Content-Type: application/json
+
+{
+  "memberId": "{{memberId}}",
+  "bookId": "00000000-0000-0000-0000-000000000099"
+}
